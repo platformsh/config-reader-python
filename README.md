@@ -1,1 +1,1 @@
-#platformsh-config-reader-python3
+# platformsh-config-reader-python3
