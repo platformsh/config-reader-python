@@ -18,7 +18,7 @@
       ]
    },
    "variables" : {},
-   "type" : "php:7.2",
+   "type" : "python:3.7",
    "access" : {
       "ssh" : "contributor"
    },
