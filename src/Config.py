@@ -165,11 +165,11 @@ class Config:
             raise RuntimeError('Relationships are not available during the build phase.')
 
         if self.empty(self.relationshipsDef[relationship]):
-            raise ValueError('No relationship defined: {relationship}. Check your .platform.app.yaml file.')
+            raise ValueError('No relationship defined: {}. Check your .platform.app.yaml file.'.format(relationship))
 
         if self.empty(self.relationshipsDef[relationship][index]):
-            raise ValueError('No index {index} defined for relationship: {relationship}.  '
-                             'Check your .platform.app.yaml file.')
+            raise ValueError('No index {} defined for relationship: {}.  '
+                             'Check your .platform.app.yaml file.'.format(index, relationship))
 
         return self.relationshipsDef[relationship][index]
 
@@ -251,7 +251,7 @@ class Config:
 
                 return route
 
-        ValueError('No such route id found: {route_id}')
+        ValueError('No such route id found: {}'.format(route_id))
 
     def application(self):
         """Returns the application definition array.
@@ -356,14 +356,14 @@ class Config:
 
         if not self.is_valid_platform():
 
-            RuntimeError('You are not running on Platform.sh, so the {config_property} variable are not available.')
+            RuntimeError('You are not running on Platform.sh, so the {} variable are not available.'.format(config_property))
 
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
 
         if self.in_build() and is_runtime_var:
 
-            ValueError('The {config_property} variable is not available during build time.')
+            ValueError('The {} variable is not available during build time.'.format(config_property))
 
         if is_build_var:
 
@@ -373,7 +373,7 @@ class Config:
 
             return self.get_value(self.directVariablesRuntime[config_property])
 
-        raise ValueError('No such variable defined: {config_property}')
+        raise ValueError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
         """Checks whether a configuration property is set.
