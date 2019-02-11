@@ -89,6 +89,7 @@ class Config:
         #     );
         # }
 
+
     @staticmethod
     def should_decode(current_property):
         """Determines whether a variable needs to be decoded.
