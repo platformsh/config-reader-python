@@ -302,7 +302,6 @@ class ConfigTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             branch = config.branch
 
-
     def test_missing_property_throws_in_build(self):
 
         env = self.mockEnvironmentBuild
@@ -335,19 +334,12 @@ class ConfigTest(unittest.TestCase):
 
         self.assertEqual('python:3.7', app['type'])
 
-    # @staticmethod
-    # def test_invalid_json_throws():
-    #     """
-    #
-    #     :return:
-    #
-    #     ..todo:: Figure out format on inputted env variable. Should be a dictionary?
-    #     ..todo:: Figure out how to handle expectException/expectExceptionMessage for JSON decode
-    #     """
-    #
-    #     config = Config({'PLATFORM_APPLICATION_NAME': 'app',
-    #                      'PLATFORM_ENVIRONMENT': 'test-environment',
-    #                      'PLATFORM_VARIABLES': base64.encodebytes('{some-invalid-json}')})
+    def test_invalid_json_throws(self):
+
+        with self.assertRaises(TypeError):
+            config = Config({'PLATFORM_APPLICATION_NAME': 'app',
+                             'PLATFORM_ENVIRONMENT': 'test-environment',
+                             'PLATFORM_VARIABLES': base64.encodebytes('{some-invalid-json}')})
 
     def test_custom_prefix_works(self):
 
@@ -358,10 +350,7 @@ class ConfigTest(unittest.TestCase):
     @staticmethod
     def encode(value):
 
-        # return base64.encodestring(json.dumps(value))
-        # return json.dumps(value)
         return base64.b64encode(json.dumps(value).encode('utf-8'))
-        # return base64.b64encode(json.dumps(value))
 
 
 if __name__ == "__main__":

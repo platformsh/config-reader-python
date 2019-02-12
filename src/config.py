@@ -26,9 +26,6 @@ class Config:
     # The key is the property that will be read. The value is the environment variables, minus
     # prefix, that contains the value to look up.
 
-    # ..todo:: Do we want these instance variables to be class variables, or defined specifically
-    #       as instance attributes?
-
     directVariables = {'project': 'PROJECT', 'appDir': 'APP_DIR', 'applicationName': 'APPLICATION_NAME',
                        'treeID': 'TREE_ID', 'entropy': 'PROJECT_ENTROPY'}
 
@@ -168,7 +165,6 @@ class Config:
         if relationship not in self.relationshipsDef.keys():
             raise ValueError('No relationship defined: {}. Check your .platform.app.yaml file.'.format(relationship))
 
-        # if index not in self.relationshipsDef[relationship]:
         if index not in range(len(self.relationshipsDef)):
             raise ValueError('No index {} defined for relationship: {}.  '
                              'Check your .platform.app.yaml file.'.format(index, relationship))
@@ -320,25 +316,13 @@ class Config:
         :return: mixed
             An associative array (if representing a JSON object), or a scalar type.
 
-        ..todo:: Figure out json_decode()
-        ..todo:: Figure base64_decode()
-
-        ..todo:: Update Exception to more elegant type. (see oop/accounts.py)
         """
 
         try:
             return json.loads(base64.decodebytes(variable))
-        # variables = json.loads(base64.b64decode(os.getenv('PLATFORM_VARIABLES')).decode('utf-8'))
 
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
-
-        # $result = json_decode(base64_decode($variable), true);
-        # if (json_last_error()) {
-        #     throw new \Exception(
-        #         sprintf('Error decoding JSON, code: %d', json_last_error())
-        #     );
-        # }
 
     def __getattr__(self, config_property):
         """Gets a configuration property.
@@ -354,7 +338,8 @@ class Config:
 
         if not self.is_valid_platform():
 
-            raise RuntimeError('You are not running on Platform.sh, so the {} variable are not available.'.format(config_property))
+            raise RuntimeError('You are not running on Platform.sh, so the {} variable are '
+                               'not available.'.format(config_property))
 
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
@@ -381,7 +366,6 @@ class Config:
         :return: bool
             True if the property exists and is not None, False otherwise.
 
-        ..todo:: Review isset return logic.
         """
 
         if not self.is_valid_platform():
