@@ -97,7 +97,6 @@ class Config:
             The prefix for environment variables. Defaults to 'PLATFORM_'.
 
         """
-        # print(environment_variables)
 
         self.environmentVariables = os.environ if environment_variables is None else environment_variables
         self.envPrefix = env_prefix
