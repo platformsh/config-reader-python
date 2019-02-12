@@ -4,20 +4,39 @@ import base64
 
 
 class Config:
-    """A class used to read Platform.sh configuration from environment variables.
+    """Reads Platform.sh configuration from environment variables.
 
-    Methods
-    -------
-    is_available
-        Checks whether any configuration is available.
-    get_env
-        Load environment variables.
-    decode(variable)
-        Decodes a Platform.sh environment variable.
-    should_decode(property)
-        Determines whether a variable needs to be decoded.
-    get_variable_name(property)
-        Get the name of an environment variable.
+    https://docs.platform.sh/development/variables.html
+
+    The following are 'magic' properties that may exist on a Config object.
+    Before accessing a property, check its existence with hasattr(config, variableName).
+    Attempting to access a nonexistent variable will throw an exception.
+
+    These properties are available at build time and run time:
+
+    project
+        The project ID.
+    applicationName
+        The name of the application, as defined in its configuration.
+    treeId
+        An ID identifying the application tree before it was built: a unique hash
+        is generated based on the contents of the application's files in the repository.
+    appDir
+        The absolute path to the application.
+    entropy
+        A random string generated for each project, useful for generating hash keys.
+
+    These properties are only available at runtime:
+
+    branch
+        The Git branch name.
+    environment
+        The environment ID (usually the Git branch plus a hash).
+    documentRoot
+        The absolute path to the web root of the applicatino.
+    smtpHost
+        The hostname of the Platform.sh defauilt SMTP server (an empty string
+        if emails are disabled on the environment.
 
     """
 
@@ -122,23 +141,6 @@ class Config:
         """
 
         return self.is_valid_platform() and not self.get_value('ENVIRONMENT')
-
-    @staticmethod
-    def empty(given_variable):
-        """Python replacement for PHPs empty().
-        Determine whether a variable is considered to be empty.
-
-        :param given_variable: mixed
-            Variable to be checked.
-        :return: bool
-            True if variable is empty, False otherwise.
-        """
-
-        if not given_variable:
-
-            return True
-
-        return False
 
     def credentials(self, relationship, index=0):
         """Retrieves the credentials for accessing a relationship.

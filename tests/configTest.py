@@ -51,16 +51,6 @@ class ConfigTest(unittest.TestCase):
         return False
 
     @staticmethod
-    def is_array(var):
-
-        return isinstance(var, dict)
-
-    @staticmethod
-    def isset(variable):
-
-        return variable in locals() or variable in globals()
-
-    @staticmethod
     def loadJsonFile(name):
 
         data_path = os.getcwd() + '/tests/valid/{}.json'.format(name)
