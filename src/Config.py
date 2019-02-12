@@ -151,9 +151,9 @@ class Config:
             The index within the relationship to access. This is always 0, but reserved for future extension.
         :return: array
             The credentials array for the service pointed to by the relationship.
-        :exception RuntimeException:
+        :exception RuntimeError:
             Thrown if called in a context that has no relationships (eg, in build).
-        :exception InvalidArgumentException:
+        :exception ValueError:
             Thrown if the relationship/index pair requested does not exist.
 
         """
