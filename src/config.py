@@ -81,6 +81,7 @@ class Config:
             The prefix for environment variables. Defaults to 'PLATFORM_'.
 
         """
+        # print(environment_variables)
 
         self.environmentVariables = os.environ if environment_variables is None else environment_variables
         self.envPrefix = env_prefix
@@ -164,10 +165,11 @@ class Config:
         if self.in_build():
             raise RuntimeError('Relationships are not available during the build phase.')
 
-        if self.empty(self.relationshipsDef[relationship]):
+        if relationship not in self.relationshipsDef.keys():
             raise ValueError('No relationship defined: {}. Check your .platform.app.yaml file.'.format(relationship))
 
-        if self.empty(self.relationshipsDef[relationship][index]):
+        # if index not in self.relationshipsDef[relationship]:
+        if index not in range(len(self.relationshipsDef)):
             raise ValueError('No index {} defined for relationship: {}.  '
                              'Check your .platform.app.yaml file.'.format(index, relationship))
 
@@ -193,7 +195,7 @@ class Config:
 
             return default
 
-        return self.variablesDef[name] or default
+        return self.variablesDef[name] if name in self.variablesDef.keys() else default
 
     def variables(self):
         """Returns the full variables array.
@@ -211,6 +213,7 @@ class Config:
 
         return self.variablesDef
 
+    @property
     def routes(self):
         """Return the routes definition.
 
@@ -220,10 +223,10 @@ class Config:
             If the routes are not accessible due to being in the wrong environment.
         """
         if not self.is_valid_platform():
-            RuntimeError('You are not running on Platform.sh, so routes are not available.')
+            raise RuntimeError('You are not running on Platform.sh, so routes are not available.')
 
         if self.in_build():
-            RuntimeError('Routes are not available during the build phase.')
+            raise RuntimeError('Routes are not available during the build phase.')
 
         return self.routesDef
 
@@ -237,13 +240,9 @@ class Config:
         :exception ValueError:
             If there is no route by that ID, an exception is thrown.
 
-        ..todo:: Double-check for loop logic
-        ..todo:: Double-check if statement logic
-        ..todo:: Double-check ValueError syntax
         """
 
-        # for (url, route) in self.routes().items:  # For dictionaries
-        for (url, route) in enumerate(self.routes()):  # For lists
+        for (url, route) in self.routes.items():
 
             if route['id'] == route_id:
 
@@ -251,7 +250,7 @@ class Config:
 
                 return route
 
-        ValueError('No such route id found: {}'.format(route_id))
+        raise ValueError('No such route id found: {}'.format(route_id))
 
     def application(self):
         """Returns the application definition array.
@@ -308,7 +307,7 @@ class Config:
 
         check_name = self.envPrefix + name.upper()
 
-        return self.environmentVariables[check_name] or None
+        return self.environmentVariables[check_name] if check_name in self.environmentVariables.keys() else None
 
     @staticmethod
     def decode(variable):
@@ -341,7 +340,7 @@ class Config:
         #     );
         # }
 
-    def __get__(self, instance, owner, config_property):
+    def __getattr__(self, config_property):
         """Gets a configuration property.
 
         :param config_property: string
@@ -351,19 +350,18 @@ class Config:
         :return: mixed
             The return types are documented in the DocBlock for this class.
 
-        ..todo:: Double check __get__ magic logic.
         """
 
         if not self.is_valid_platform():
 
-            RuntimeError('You are not running on Platform.sh, so the {} variable are not available.'.format(config_property))
+            raise RuntimeError('You are not running on Platform.sh, so the {} variable are not available.'.format(config_property))
 
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
 
         if self.in_build() and is_runtime_var:
 
-            ValueError('The {} variable is not available during build time.'.format(config_property))
+            raise ValueError('The {} variable is not available during build time.'.format(config_property))
 
         if is_build_var:
 
