@@ -106,7 +106,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual('/app', config.appDir)
         self.assertEqual('app', config.applicationName)
         self.assertEqual('test-project', config.project)
-        self.assertEqual('abc123', config.treeId)
+        self.assertEqual('abc123', config.treeID)
         self.assertEqual('def789', config.entropy)
 
     def _test_runtime_properties_are_available(self):
@@ -230,9 +230,6 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual('someval', config.variable('somevar'))
 
     def test_credentials_missing_relationship_index_throws(self):
-        """
-        ..todo:: tied to test_credentials_existing relationship_returns indexing
-        """
 
         env = self.mockEnvironmentDeploy
 
@@ -259,85 +256,74 @@ class ConfigTest(unittest.TestCase):
 
         self.assertEqual('someval', variables['somevar'])
 
-    # def test_build_property_in_build_exists(self):
-    #
-    #     env = self.mockEnvironmentBuild
-    #
-    #     config = Config(env)
-    #
-    #     self.assertTrue(self.isset(config.appDir))
-    #     self.assertTrue(self.isset(config.applicationName))
-    #     self.assertTrue(self.isset(config.project))
-    #     self.assertTrue(self.isset(config.treeId))
-    #     self.assertTrue(self.isset(config.entropy))
-    #
-    #     self.assertEqual('/app', config.appDir)
-    #     self.assertEqual('app', config.applicationName)
-    #     self.assertEqual('test-project', config.project)
-    #     self.assertEqual('abc123', config.treeId)
-    #     self.assertEqual('def789', config.entropy)
+    def test_build_property_in_build_exists(self):
 
-    # # FAIL - @ 287
-    # def test_build_and_deploy_properties_in_deploy_exists(self):
-    #
-    #     env = self.mockEnvironmentDeploy
-    #
-    #     config = Config(env)
-    #
-    #     self.assertTrue(self.isset(config.appDir))
-    #     self.assertTrue(self.isset(config.applicationName))
-    #     self.assertTrue(self.isset(config.project))
-    #     self.assertTrue(self.isset(config.treeId))
-    #     self.assertTrue(self.isset(config.entropy))
-    #
-    #     self.assertTrue(self.isset(config.branch))
-    #     self.assertTrue(self.isset(config.environment))
-    #     self.assertTrue(self.isset(config.documentRoot))
-    #     self.assertTrue(self.isset(config.smtpHost))
-    #
-    #     self.assertEqual('/app', config.appDir)
-    #     self.assertEqual('app', config.applicationName)
-    #     self.assertEqual('test-project', config.project)
-    #     self.assertEqual('abc123', config.treeId)
-    #     self.assertEqual('def789', config.entropy)
-    #
-    #     self.assertEqual('feature-x', config.branch)
-    #     self.assertEqual('feature-x-hgi456', config.environment)
-    #     self.assertEqual('/app/web', config.documentRoot)
-    #     self.assertEqual('1.2.3.4', config.smtpHost)
+        env = self.mockEnvironmentBuild
 
-    # def test_deploy_property_in_build_throws(self):
-    #     """
-    #     ..todo:: isset logic?
-    #     """
-    #
-    #     env = self.mockEnvironmentBuild
-    #
-    #     config = Config(env)
-    #
-    #     # self.assertFalse(self.isset(config.branch))
-    #     with self.assertRaises(ValueError):
-    #         branch = config.branch
+        config = Config(env)
 
-    # def test_missing_property_throws_in_build(self):
-    #
-    #     env = self.mockEnvironmentBuild
-    #
-    #     config = Config(env)
-    #
-    #     self.assertFalse(self.isset(config.missing))
-    #     # self.assertRaises(ValueError, config.missing)
-    #     # with self.assertRaises(ValueError):
-    #     #     config.missing
+        self.assertTrue(hasattr(config, 'appDir'))
+        self.assertTrue(hasattr(config, 'applicationName'))
+        self.assertTrue(hasattr(config, 'project'))
+        self.assertTrue(hasattr(config, 'treeID'))
+        self.assertTrue(hasattr(config, 'entropy'))
 
-    # def test_missing_property_throws_in_deploy(self):
-    #
-    #     env = self.mockEnvironmentDeploy
-    #
-    #     config = Config(env)
-    #
-    #     self.assertFalse(self.isset(config.missing))
-    #     self.assertRaises(ValueError, config.missing)
+        self.assertEqual('/app', config.appDir)
+        self.assertEqual('app', config.applicationName)
+        self.assertEqual('test-project', config.project)
+        self.assertEqual('abc123', config.treeID)
+        self.assertEqual('def789', config.entropy)
+
+    def test_build_and_deploy_properties_in_deploy_exists(self):
+
+        env = self.mockEnvironmentDeploy
+
+        config = Config(env)
+
+        self.assertTrue(hasattr(config, 'appDir'))
+        self.assertTrue(hasattr(config, 'applicationName'))
+        self.assertTrue(hasattr(config, 'project'))
+        self.assertTrue(hasattr(config, 'treeID'))
+        self.assertTrue(hasattr(config, 'entropy'))
+
+        self.assertTrue(hasattr(config, 'branch'))
+        self.assertTrue(hasattr(config, 'environment'))
+        self.assertTrue(hasattr(config, 'documentRoot'))
+        self.assertTrue(hasattr(config, 'smtpHost'))
+
+    def test_deploy_property_in_build_throws(self):
+
+        env = self.mockEnvironmentBuild
+
+        config = Config(env)
+
+        self.assertFalse('branch' in dir(config))
+
+        with self.assertRaises(ValueError):
+            branch = config.branch
+
+
+    def test_missing_property_throws_in_build(self):
+
+        env = self.mockEnvironmentBuild
+
+        config = Config(env)
+
+        self.assertFalse('missing' in dir(config))
+
+        with self.assertRaises(ValueError):
+            missing = config.missing
+
+    def test_missing_property_throws_in_deploy(self):
+
+        env = self.mockEnvironmentDeploy
+
+        config = Config(env)
+
+        self.assertFalse('missing' in dir(config))
+
+        with self.assertRaises(ValueError):
+            missing = config.missing
 
     def test_application_array_available(self):
 
