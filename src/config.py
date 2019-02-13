@@ -84,12 +84,13 @@ class Config:
         self.envPrefix = env_prefix
 
         if self.is_valid_platform():
-            if not self.in_build() and self._get_value('ROUTES'):
-                routes = self._get_value('ROUTES')
-                self.routesDef = self.decode(routes)
-            if not self.in_build() and self._get_value('RELATIONSHIPS'):
-                relationships = self._get_value('RELATIONSHIPS')
-                self.relationshipsDef = self.decode(relationships)
+            if not self.in_build():
+                if self._get_value('ROUTES'):
+                    routes = self._get_value('ROUTES')
+                    self.routesDef = self.decode(routes)
+                if self._get_value('RELATIONSHIPS'):
+                    relationships = self._get_value('RELATIONSHIPS')
+                    self.relationshipsDef = self.decode(relationships)
             if self._get_value('VARIABLES'):
                 variables = self._get_value('VARIABLES')
                 self.variablesDef = self.decode(variables)
@@ -164,7 +165,7 @@ class Config:
 
         if not self.is_valid_platform():
             return default
-        return self.variablesDef[name] if name in self.variablesDef.keys() else default
+        return self.variablesDef.get(name, default)
 
     def variables(self):
         """Returns the full variables array.
@@ -270,7 +271,7 @@ class Config:
         """
 
         check_name = self.envPrefix + name.upper()
-        return self.environmentVariables[check_name] if check_name in self.environmentVariables.keys() else None
+        return self.environmentVariables.get(check_name)
 
     @staticmethod
     def decode(variable):
