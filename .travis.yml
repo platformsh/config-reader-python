@@ -10,8 +10,7 @@ python:
 cache: pip
 
 install:
-  - pip install pipenv
-  - pipenv shell
+  - pip
 
 script:
-  - python3 -m tests.configTest
+  - python -m tests.configTest
