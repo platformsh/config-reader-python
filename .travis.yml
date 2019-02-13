@@ -11,7 +11,7 @@ cache: pip
 
 install:
   - pip install pipenv
-  - pip shell
+  - pipenv shell
 
 script:
   - python3 -m tests.configTest
