@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import base64
 
@@ -291,7 +292,10 @@ class Config:
         """
 
         try:
-            return json.loads(base64.decodebytes(variable))
+            if sys.version_info[1] > 5:
+                return json.loads(base64.decodebytes(variable))
+            else:
+                return json.loads(base64.decodestring(variable))
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
 
