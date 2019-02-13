@@ -15,7 +15,3 @@ cache: pip
 install:
   - pip
   - pytest
-
-script:
-  - python -m tests.configTest
-  - pytest tests/configTest.py
