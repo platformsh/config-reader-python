@@ -322,10 +322,11 @@ class Config:
         """
 
         try:
+
             if sys.version_info[1] > 5:
                 return json.loads(base64.decodebytes(variable))
             else:
-                return json.loads(variable)
+                return json.loads(variable.decode('UTF-8'))
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
 
