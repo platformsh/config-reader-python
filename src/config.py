@@ -10,7 +10,7 @@ class Config:
     See: https://docs.platform.sh/development/variables.html
 
     The following are 'magic' properties that may exist on a Config object. Before accessing a property, check its
-    existence with config['variableName']. Attempting to access a nonexistent variable will throw an exception.
+    existence with hasattr(config, variableName). Attempting to access a nonexistent variable will throw an exception.
 
     Attributes:
         directVariables (dict):
