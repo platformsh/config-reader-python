@@ -12,7 +12,34 @@ class Config:
     Before accessing a property, check its existence with hasattr(config, variableName).
     Attempting to access a nonexistent variable will throw an exception.
 
+    Attributes
+    ----------
+
+    directVariables
+        Local index of the variables that can be accessed as direct properties (build and runtime).
+        The key is the property that will be read.
+        The value is the environment variables, minus prefix, that contains the value to look up.
+    directVariablesRuntime
+        Local index of the variables that can be accessed as direct properties (runtime only).
+        The key is the property that will be read.
+        The value is the environment variables, minus prefix, that contains the value to look up.
+    environmentVariables
+        A local copy of all environment variables as of when the object was initialized
+    envPrefix
+        The vendor prefix for all environment variables we care about.
+    routesDef
+        The routes definition array. Only available at runtime.
+    relationshipsDef
+        The relationships definition array. Only available at runtime.
+    variablesDef
+        The variables definition array. Available in both build and runtime, although possibly
+        with different values.
+    applicationDef
+        The application definition array. This is, approximately, the .platform.app.yaml file
+        in nested array form.
+
     These properties are available at build time and run time:
+    ----------------------------------------------------------
 
     project
         The project ID.
@@ -27,65 +54,37 @@ class Config:
         A random string generated for each project, useful for generating hash keys.
 
     These properties are only available at runtime:
+    -----------------------------------------------
 
     branch
         The Git branch name.
     environment
         The environment ID (usually the Git branch plus a hash).
     documentRoot
-        The absolute path to the web root of the applicatino.
+        The absolute path to the web root of the application.
     smtpHost
-        The hostname of the Platform.sh defauilt SMTP server (an empty string
+        The hostname of the Platform.sh default SMTP server (an empty string
         if emails are disabled on the environment.
 
     """
 
-    # Local index of the variables that can be accessed as direct properties (build and runtime).
+    directVariables = {'project': 'PROJECT',
+                       'appDir': 'APP_DIR',
+                       'applicationName': 'APPLICATION_NAME',
+                       'treeID': 'TREE_ID',
+                       'entropy': 'PROJECT_ENTROPY'}
 
-    # The key is the property that will be read. The value is the environment variables, minus
-    # prefix, that contains the value to look up.
-
-    directVariables = {'project': 'PROJECT', 'appDir': 'APP_DIR', 'applicationName': 'APPLICATION_NAME',
-                       'treeID': 'TREE_ID', 'entropy': 'PROJECT_ENTROPY'}
-
-    # Local index of the variabels that can be accessed as direct properties (runtime only).
-
-    # The key is the property that will be read. THe value is the environment variables, minus
-    # prefix, that contains the value to look up.
-
-    directVariablesRuntime = {'branch': 'BRANCH', 'environment': 'ENVIRONMENT', 'documentRoot': 'DOCUMENT_ROOT',
+    directVariablesRuntime = {'branch': 'BRANCH',
+                              'environment': 'ENVIRONMENT',
+                              'documentRoot': 'DOCUMENT_ROOT',
                               'smtpHost': 'SMTP_HOST'}
 
-    # A local copy of all environment variables as of when the object was initialized
-
     environmentVariables = []
-
-    # The vendor prefix for all environment variables we care about.
-
     envPrefix = ''
 
-    # The routes definition array.
-
-    # Only available at runtime.
-
     routesDef = []
-
-    # The relationships definition array.
-
-    # Only available at runtime.
-
     relationshipsDef = []
-
-    # The variables definition array.
-
-    # Available in both build and runtime, although possibly with different values.
-
     variablesDef = []
-
-    # The application definition array.
-
-    # This is, approximately, the .platform.app.yaml file in nested array form.
-
     applicationDef = []
 
     def __init__(self, environment_variables=None, env_prefix='PLATFORM_'):
@@ -102,24 +101,16 @@ class Config:
         self.envPrefix = env_prefix
 
         if self.is_valid_platform():
-
             if not self.in_build() and self.get_value('ROUTES'):
-
                 routes = self.get_value('ROUTES')
                 self.routesDef = self.decode(routes)
-
             if not self.in_build() and self.get_value('RELATIONSHIPS'):
-
                 relationships = self.get_value('RELATIONSHIPS')
                 self.relationshipsDef = self.decode(relationships)
-
             if self.get_value('VARIABLES'):
-
                 variables = self.get_value('VARIABLES')
                 self.variablesDef = self.decode(variables)
-
             if self.get_value('APPLICATION'):
-
                 application = self.get_value('APPLICATION')
                 self.applicationDef = self.decode(application)
 
@@ -159,17 +150,13 @@ class Config:
 
         if not self.is_valid_platform():
             raise RuntimeError('You are not running on Platform.sh, so relationships are not available.')
-
         if self.in_build():
             raise RuntimeError('Relationships are not available during the build phase.')
-
         if relationship not in self.relationshipsDef.keys():
             raise ValueError('No relationship defined: {}. Check your .platform.app.yaml file.'.format(relationship))
-
         if index not in range(len(self.relationshipsDef)):
             raise ValueError('No index {} defined for relationship: {}.  '
                              'Check your .platform.app.yaml file.'.format(index, relationship))
-
         return self.relationshipsDef[relationship][index]
 
     def variable(self, name, default=None):
@@ -189,9 +176,7 @@ class Config:
         """
 
         if not self.is_valid_platform():
-
             return default
-
         return self.variablesDef[name] if name in self.variablesDef.keys() else default
 
     def variables(self):
@@ -205,9 +190,7 @@ class Config:
         """
 
         if not self.is_valid_platform():
-
-            RuntimeError('You are not running on Platform.sh, so the variables array is not available.')
-
+            raise RuntimeError('You are not running on Platform.sh, so the variables array is not available.')
         return self.variablesDef
 
     @property
@@ -221,10 +204,8 @@ class Config:
         """
         if not self.is_valid_platform():
             raise RuntimeError('You are not running on Platform.sh, so routes are not available.')
-
         if self.in_build():
             raise RuntimeError('Routes are not available during the build phase.')
-
         return self.routesDef
 
     def get_route(self, route_id):
@@ -240,13 +221,9 @@ class Config:
         """
 
         for (url, route) in self.routes.items():
-
             if route['id'] == route_id:
-
                 route['url'] = url
-
                 return route
-
         raise ValueError('No such route id found: {}'.format(route_id))
 
     def application(self):
@@ -260,9 +237,7 @@ class Config:
         """
 
         if not self.is_valid_platform():
-
-            RuntimeError('You are not running on Platform.sh, so the application definition are not available.')
-
+            raise RuntimeError('You are not running on Platform.sh, so the application definition are not available.')
         return self.applicationDef
 
     def on_enterprise(self):
@@ -287,11 +262,8 @@ class Config:
         """
 
         if not self.is_valid_platform() and not self.in_build():
-
             return False
-
         prod_branch = 'production' if self.on_enterprise() else 'master'
-
         return self.get_value('BRANCH') == prod_branch
 
     def get_value(self, name):
@@ -303,7 +275,6 @@ class Config:
         """
 
         check_name = self.envPrefix + name.upper()
-
         return self.environmentVariables[check_name] if check_name in self.environmentVariables.keys() else None
 
     @staticmethod
@@ -321,7 +292,6 @@ class Config:
 
         try:
             return json.loads(base64.decodebytes(variable))
-
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
 
@@ -338,25 +308,16 @@ class Config:
         """
 
         if not self.is_valid_platform():
-
-            raise RuntimeError('You are not running on Platform.sh, so the {} variable are '
+            raise RuntimeError('You are not running on Platform.sh, so the {} variable is '
                                'not available.'.format(config_property))
-
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
-
         if self.in_build() and is_runtime_var:
-
             raise ValueError('The {} variable is not available during build time.'.format(config_property))
-
         if is_build_var:
-
             return self.get_value(self.directVariables[config_property])
-
         if is_runtime_var:
-
             return self.get_value(self.directVariablesRuntime[config_property])
-
         raise ValueError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
@@ -370,18 +331,13 @@ class Config:
         """
 
         if not self.is_valid_platform():
-
             return False
 
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
 
         if self.in_build():
-
             return is_build_var and config_property is not None
-
         if is_build_var or is_runtime_var:
-
             return True and config_property is not None
-
         return False

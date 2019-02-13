@@ -19,7 +19,6 @@ class ConfigTest(unittest.TestCase):
         env = self.loadJsonFile('ENV')
 
         for item in ['PLATFORM_APPLICATION', 'PLATFORM_VARIABLES']:
-
             env[item] = self.encode(self.loadJsonFile(item))
 
         self.mockEnvironmentBuild = env
@@ -27,13 +26,10 @@ class ConfigTest(unittest.TestCase):
         # These sub-values are always encoded
 
         for item in ['PLATFORM_ROUTES', 'PLATFORM_RELATIONSHIPS']:
-
             env[item] = self.encode(self.loadJsonFile(item))
 
         env_runtime = self.loadJsonFile('ENV_runtime')
-
         env = self.array_merge(env, env_runtime)
-
         self.mockEnvironmentDeploy = env
 
     @staticmethod
@@ -41,52 +37,42 @@ class ConfigTest(unittest.TestCase):
 
         if isinstance(first_array, list) and isinstance(second_array, list):
             return first_array + second_array
-
         elif isinstance(first_array, dict) and isinstance(second_array, dict):
             return dict(list(first_array.items()) + list(second_array.items()))
-
         elif isinstance(first_array, set) and isinstance(second_array, set):
             return first_array.union(second_array)
-
         return False
 
     @staticmethod
     def loadJsonFile(name):
 
         data_path = os.getcwd() + '/tests/valid/{}.json'.format(name)
-
         with open(data_path, 'r') as read_file:
-
             return json.load(read_file)
 
     def test_not_on_platform_returns_correctly(self):
 
         config = Config()
-
         self.assertFalse(config.is_valid_platform())
 
     def test_on_platform_returns_correctly_in_runtime(self):
 
         config = Config(self.mockEnvironmentDeploy)
-
         self.assertTrue(config.is_valid_platform())
 
     def test_on_platform_returns_correctly_in_build(self):
 
         config = Config(self.mockEnvironmentBuild)
-
         self.assertTrue(config.in_build())
 
     def test_inbuild_in_build_phase_is_true(self):
 
         config = Config(self.mockEnvironmentBuild)
-
         self.assertTrue(config.in_build())
 
     def test_inbuild_in_deploy_phase_is_false(self):
 
         config = Config(self.mockEnvironmentDeploy)
-
         self.assertFalse(config.in_build())
 
     def _test_buildtime_properties_are_available(self):
