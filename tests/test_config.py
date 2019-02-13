@@ -220,7 +220,8 @@ class ConfigTest(unittest.TestCase):
 
         config = Config(env)
 
-        self.assertEqual('default-val', config.variable('missing', 'default-val'))
+        self.assertEqual('default-val',
+                         config.variable('missing', 'default-val'))
 
     def test_variables_returns_on_platform(self):
 
@@ -313,9 +314,14 @@ class ConfigTest(unittest.TestCase):
     def test_invalid_json_throws(self):
 
         with self.assertRaises(TypeError):
-            config = Config({'PLATFORM_APPLICATION_NAME': 'app',
-                             'PLATFORM_ENVIRONMENT': 'test-environment',
-                             'PLATFORM_VARIABLES': base64.encodebytes('{some-invalid-json}')})
+            config = Config({
+                'PLATFORM_APPLICATION_NAME':
+                'app',
+                'PLATFORM_ENVIRONMENT':
+                'test-environment',
+                'PLATFORM_VARIABLES':
+                base64.encodebytes('{some-invalid-json}')
+            })
 
     def test_custom_prefix_works(self):
 

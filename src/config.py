@@ -161,14 +161,20 @@ class Config:
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError('You are not running on Platform.sh, so relationships are not available.')
+            raise RuntimeError(
+                'You are not running on Platform.sh, so relationships are not available.'
+            )
         if self.in_build():
-            raise RuntimeError('Relationships are not available during the build phase.')
+            raise RuntimeError(
+                'Relationships are not available during the build phase.')
         if relationship not in self.relationshipsDef.keys():
-            raise ValueError('No relationship defined: {}. Check your .platform.app.yaml file.'.format(relationship))
+            raise ValueError(
+                'No relationship defined: {}. Check your .platform.app.yaml file.'
+                .format(relationship))
         if index not in range(len(self.relationshipsDef)):
             raise ValueError('No index {} defined for relationship: {}.  '
-                             'Check your .platform.app.yaml file.'.format(index, relationship))
+                             'Check your .platform.app.yaml file.'.format(
+                                 index, relationship))
         return self.relationshipsDef[relationship][index]
 
     def variable(self, name, default=None):
@@ -206,7 +212,9 @@ class Config:
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError('You are not running on Platform.sh, so the variables array is not available.')
+            raise RuntimeError(
+                'You are not running on Platform.sh, so the variables array is not available.'
+            )
         return self.variablesDef
 
     @property
@@ -222,9 +230,12 @@ class Config:
 
         """
         if not self.is_valid_platform():
-            raise RuntimeError('You are not running on Platform.sh, so routes are not available.')
+            raise RuntimeError(
+                'You are not running on Platform.sh, so routes are not available.'
+            )
         if self.in_build():
-            raise RuntimeError('Routes are not available during the build phase.')
+            raise RuntimeError(
+                'Routes are not available during the build phase.')
         return self.routesDef
 
     def get_route(self, route_id):
@@ -261,7 +272,9 @@ class Config:
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError('You are not running on Platform.sh, so the application definition are not available.')
+            raise RuntimeError(
+                'You are not running on Platform.sh, so the application definition are not available.'
+            )
         return self.applicationDef
 
     def on_enterprise(self):
@@ -349,12 +362,15 @@ class Config:
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError('You are not running on Platform.sh, so the {} variable is '
-                               'not available.'.format(config_property))
+            raise RuntimeError(
+                'You are not running on Platform.sh, so the {} variable is '
+                'not available.'.format(config_property))
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
         if self.in_build() and is_runtime_var:
-            raise ValueError('The {} variable is not available during build time.'.format(config_property))
+            raise ValueError(
+                'The {} variable is not available during build time.'.format(
+                    config_property))
         if is_build_var:
             return self[self.directVariables[config_property]]
         if is_runtime_var:
