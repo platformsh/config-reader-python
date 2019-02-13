@@ -1,0 +1,20 @@
+language: python
+
+python:
+  - 3.5.6
+  - 3.6
+
+matrix:
+    include:
+        - python: 3.7
+          dist: xenial
+          sudo: true
+
+cache: pip
+
+install:
+  - pip
+  - pytest
+
+script:
+  - pytest
