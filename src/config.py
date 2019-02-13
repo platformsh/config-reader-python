@@ -102,17 +102,17 @@ class Config:
         self.envPrefix = env_prefix
 
         if self.is_valid_platform():
-            if not self.in_build() and self.get_value('ROUTES'):
-                routes = self.get_value('ROUTES')
+            if not self.in_build() and self._get_value('ROUTES'):
+                routes = self._get_value('ROUTES')
                 self.routesDef = self.decode(routes)
-            if not self.in_build() and self.get_value('RELATIONSHIPS'):
-                relationships = self.get_value('RELATIONSHIPS')
+            if not self.in_build() and self._get_value('RELATIONSHIPS'):
+                relationships = self._get_value('RELATIONSHIPS')
                 self.relationshipsDef = self.decode(relationships)
-            if self.get_value('VARIABLES'):
-                variables = self.get_value('VARIABLES')
+            if self._get_value('VARIABLES'):
+                variables = self._get_value('VARIABLES')
                 self.variablesDef = self.decode(variables)
-            if self.get_value('APPLICATION'):
-                application = self.get_value('APPLICATION')
+            if self._get_value('APPLICATION'):
+                application = self._get_value('APPLICATION')
                 self.applicationDef = self.decode(application)
 
     def is_valid_platform(self):
@@ -122,7 +122,7 @@ class Config:
             True if configuration can be used, False otherwise.
         """
 
-        return bool(self.get_value('APPLICATION_NAME'))
+        return bool(self._get_value('APPLICATION_NAME'))
 
     def in_build(self):
         """Checks whether the code is running in a build environment.
@@ -131,7 +131,7 @@ class Config:
             True if running in build environment, False otherwise.
         """
 
-        return self.is_valid_platform() and not self.get_value('ENVIRONMENT')
+        return self.is_valid_platform() and not self._get_value('ENVIRONMENT')
 
     def credentials(self, relationship, index=0):
         """Retrieves the credentials for accessing a relationship.
@@ -248,7 +248,7 @@ class Config:
             True on an Enterprise environment, False otherwise.
         """
 
-        return self.is_valid_platform() and self.get_value('MODE') == 'enterprise'
+        return self.is_valid_platform() and self._get_value('MODE') == 'enterprise'
 
     def on_production(self):
         """Determines if the current environment is a production environment.
@@ -265,9 +265,9 @@ class Config:
         if not self.is_valid_platform() and not self.in_build():
             return False
         prod_branch = 'production' if self.on_enterprise() else 'master'
-        return self.get_value('BRANCH') == prod_branch
+        return self._get_value('BRANCH') == prod_branch
 
-    def get_value(self, name):
+    def __get_value(self, name):
         """Reads an environment variable, taking the prefix into account.
 
         :param name: string
@@ -320,9 +320,9 @@ class Config:
         if self.in_build() and is_runtime_var:
             raise ValueError('The {} variable is not available during build time.'.format(config_property))
         if is_build_var:
-            return self.get_value(self.directVariables[config_property])
+            return self._get_value(self.directVariables[config_property])
         if is_runtime_var:
-            return self.get_value(self.directVariablesRuntime[config_property])
+            return self._get_value(self.directVariablesRuntime[config_property])
         raise ValueError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
