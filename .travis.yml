@@ -15,3 +15,5 @@ cache: pip
 install:
   - pip
   - pytest
+
+script:
