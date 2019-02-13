@@ -10,7 +10,7 @@ class Config:
     See: https://docs.platform.sh/development/variables.html
 
     The following are 'magic' properties that may exist on a Config object. Before accessing a property, check its
-    existence with hasattr(config, variableName). Attempting to access a nonexistent variable will throw an exception.
+    existence with config['variableName']. Attempting to access a nonexistent variable will throw an exception.
 
     Attributes:
         directVariables (dict):
@@ -105,17 +105,17 @@ class Config:
 
         if self.is_valid_platform():
             if not self.in_build():
-                if self._get_value('ROUTES'):
-                    routes = self._get_value('ROUTES')
+                if self['ROUTES']:
+                    routes = self['ROUTES']
                     self.routesDef = self.decode(routes)
-                if self._get_value('RELATIONSHIPS'):
-                    relationships = self._get_value('RELATIONSHIPS')
+                if self['RELATIONSHIPS']:
+                    relationships = self['RELATIONSHIPS']
                     self.relationshipsDef = self.decode(relationships)
-            if self._get_value('VARIABLES'):
-                variables = self._get_value('VARIABLES')
+            if self['VARIABLES']:
+                variables = self['VARIABLES']
                 self.variablesDef = self.decode(variables)
-            if self._get_value('APPLICATION'):
-                application = self._get_value('APPLICATION')
+            if self['APPLICATION']:
+                application = self['APPLICATION']
                 self.applicationDef = self.decode(application)
 
     def is_valid_platform(self):
@@ -127,7 +127,8 @@ class Config:
 
         """
 
-        return bool(self._get_value('APPLICATION_NAME'))
+        # return bool(self._get_value('APPLICATION_NAME'))
+        return bool(self['APPLICATION_NAME'])
 
     def in_build(self):
         """Checks whether the code is running in a build environment.
@@ -137,7 +138,7 @@ class Config:
 
         """
 
-        return self.is_valid_platform() and not self._get_value('ENVIRONMENT')
+        return self.is_valid_platform() and not self['ENVIRONMENT']
 
     def credentials(self, relationship, index=0):
         """Retrieves the credentials for accessing a relationship.
@@ -272,7 +273,7 @@ class Config:
 
         """
 
-        return self.is_valid_platform() and self._get_value('MODE') == 'enterprise'
+        return self.is_valid_platform() and self['MODE'] == 'enterprise'
 
     def on_production(self):
         """Determines if the current environment is a production environment.
@@ -291,9 +292,9 @@ class Config:
         if not self.is_valid_platform() and not self.in_build():
             return False
         prod_branch = 'production' if self.on_enterprise() else 'master'
-        return self._get_value('BRANCH') == prod_branch
+        return self['BRANCH'] == prod_branch
 
-    def _get_value(self, name):
+    def __getitem__(self, item):
         """Reads an environment variable, taking the prefix into account.
 
         Args:
@@ -302,7 +303,7 @@ class Config:
 
         """
 
-        check_name = self.envPrefix + name.upper()
+        check_name = self.envPrefix + item.upper()
         return self.environmentVariables.get(check_name)
 
     @staticmethod
@@ -355,9 +356,9 @@ class Config:
         if self.in_build() and is_runtime_var:
             raise ValueError('The {} variable is not available during build time.'.format(config_property))
         if is_build_var:
-            return self._get_value(self.directVariables[config_property])
+            return self[self.directVariables[config_property]]
         if is_runtime_var:
-            return self._get_value(self.directVariablesRuntime[config_property])
+            return self[self.directVariablesRuntime[config_property]]
         raise ValueError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
