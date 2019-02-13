@@ -66,16 +66,20 @@ class Config:
 
     """
 
-    directVariables = {'project': 'PROJECT',
-                       'appDir': 'APP_DIR',
-                       'applicationName': 'APPLICATION_NAME',
-                       'treeID': 'TREE_ID',
-                       'entropy': 'PROJECT_ENTROPY'}
+    directVariables = {
+        "project": "PROJECT",
+        "appDir": "APP_DIR",
+        "applicationName": 'APPLICATION_NAME',
+        "treeID": "TREE_ID",
+        "entropy": "PROJECT_ENTROPY"
+    }
 
-    directVariablesRuntime = {'branch': 'BRANCH',
-                              'environment': 'ENVIRONMENT',
-                              'documentRoot': 'DOCUMENT_ROOT',
-                              'smtpHost': 'SMTP_HOST'}
+    directVariablesRuntime = {
+        "branch": "BRANCH",
+        "environment": "ENVIRONMENT",
+        "documentRoot": "DOCUMENT_ROOT",
+        "smtpHost": "SMTP_HOST"
+    }
 
     environmentVariables = []
     envPrefix = ''
