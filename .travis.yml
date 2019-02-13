@@ -17,4 +17,5 @@ install:
   - pytest
 
 script:
+  - python -m tests.configTest
   - pytest tests/configTest.py
