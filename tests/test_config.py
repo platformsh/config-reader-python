@@ -3,6 +3,8 @@ import json
 import base64
 import unittest
 
+from copy import deepcopy
+
 from pshconfig import Config
 
 class ConfigTest(unittest.TestCase):
@@ -20,7 +22,7 @@ class ConfigTest(unittest.TestCase):
         for item in ['PLATFORM_APPLICATION', 'PLATFORM_VARIABLES']:
             env[item] = self.encode(self.loadJsonFile(item))
 
-        self.mockEnvironmentBuild = env
+        self.mockEnvironmentBuild = deepcopy(env)
 
         # These sub-values are always encoded
 
@@ -29,7 +31,7 @@ class ConfigTest(unittest.TestCase):
 
         env_runtime = self.loadJsonFile('ENV_runtime')
         env = self.array_merge(env, env_runtime)
-        self.mockEnvironmentDeploy = env
+        self.mockEnvironmentDeploy = deepcopy(env)
 
     @staticmethod
     def array_merge(first_array, second_array):
