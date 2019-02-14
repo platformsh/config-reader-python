@@ -12,9 +12,6 @@ from setuptools import setup, find_packages
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(cwd, 'app', '__version__.py'), 'r', encoding='utf-8') as f:
-    exec(f.read())
-
 with open('README.rst', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
 
@@ -24,14 +21,15 @@ with open('CHANGELOG.rst', 'r', encoding='utf-8') as f:
 
 setup(
 
-    name         = __title__,
-    description  = __description__,
-    url          = __url__,
+    version      = '0.1.0',
+    name         = 'pshconfig',
+    description  = 'Small helper to access Platform.sh environment variables.',
+    url          = 'https://github.com/platformsh/platformsh-config-reader-python3',
 
-    author       = __author__,
-    author_email = __author_email__,
+    author       = 'Chad Carlson',
+    author_email = 'chad.carlson@platform.sh',
 
-    license      = __license__,
+    license      = 'MIT',
 
     long_description = __readme__ + '\n\n' + __changelog__,
 
