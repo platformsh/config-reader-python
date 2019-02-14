@@ -12,14 +12,24 @@ pip install pshconfig
 
 ## Usage
 
-The available variables are documented as properties of the [Config](pshconfig/config.py) class
+The available variables are documented as properties of the [Config](pshconfig/config.py) class.
 
 ```python
 from pshconfig import Config
 
+config = Config()
+
 # You can check for any particular value being available (recommended):
 
+if config.credentials('database'):
+    # Now `database` is an array representing a database service.
+    database = config.credentials('database')
 
 # Or you can check that any configuration is available at all:
+
+if config:
+    print(config['PROJECT'])
+    print(config['APPLICATION_NAME'])
+
 
 ```
