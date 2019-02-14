@@ -14,7 +14,7 @@ cache: pip
 
 install:
   - pip
-  - pshconfig
+  - pip install .
   - pytest
 
 script:
