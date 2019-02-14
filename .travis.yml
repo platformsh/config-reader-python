@@ -17,4 +17,5 @@ install:
   - pytest
 
 script:
+  - pip install .
   - pytest
