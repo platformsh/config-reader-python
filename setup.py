@@ -12,7 +12,7 @@ from setuptools import setup, find_packages
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-with open('README.rst', 'r', encoding='utf-8') as f:
+with open('README.md', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
 
 with open('CHANGELOG.rst', 'r', encoding='utf-8') as f:

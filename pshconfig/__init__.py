@@ -1,1 +1,1 @@
-from pshconfig.config import *
+from .config import *
