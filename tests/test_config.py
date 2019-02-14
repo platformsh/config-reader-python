@@ -3,8 +3,7 @@ import json
 import base64
 import unittest
 
-from src.config import Config
-
+from pshconfig import Config
 
 class ConfigTest(unittest.TestCase):
 

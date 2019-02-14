@@ -3,6 +3,9 @@ import sys
 import json
 import base64
 
+__all__ = [
+    "Config",
+]
 
 class Config:
     """Reads Platform.sh configuration from environment variables.
