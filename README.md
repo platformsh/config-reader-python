@@ -7,7 +7,7 @@ A small helper to access a Platform.sh application's configuration, via [environ
 Include it in your project with:
 
 ```bash
-pip install pshconfig
+pip install git+https://github.com/platformsh/platformsh-config-reader-python3.git
 ```
 
 ## Usage
