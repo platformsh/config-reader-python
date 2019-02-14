@@ -13,7 +13,7 @@ cwd = os.path.abspath(os.path.dirname(__file__))
 with open('README.md', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
 
-with open('CHANGELOG.rst', 'r', encoding='utf-8') as f:
+with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
     __changelog__ = f.read()
 
 setup(
