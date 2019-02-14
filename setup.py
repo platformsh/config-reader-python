@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-
 """setup.py: setuptools control."""
 
 import os.path
-import sys
 
 from codecs import open
 
@@ -18,33 +16,23 @@ with open('README.md', 'r', encoding='utf-8') as f:
 with open('CHANGELOG.rst', 'r', encoding='utf-8') as f:
     __changelog__ = f.read()
 
-
 setup(
-
-    version      = '0.1.0',
-    name         = 'pshconfig',
-    description  = 'Small helper to access Platform.sh environment variables.',
-    url          = 'https://github.com/platformsh/platformsh-config-reader-python3',
-
-    author       = 'Chad Carlson',
-    author_email = 'chad.carlson@platform.sh',
-
-    license      = 'MIT',
-
-    long_description = __readme__ + '\n\n' + __changelog__,
-
-    packages     = find_packages(),
-
+    version='0.1.0',
+    name='pshconfig',
+    description='Small helper to access Platform.sh environment variables.',
+    url='https://github.com/platformsh/platformsh-config-reader-python3',
+    author='Chad Carlson',
+    author_email='chad.carlson@platform.sh',
+    license='MIT',
+    long_description=__readme__ + '\n\n' + __changelog__,
+    packages=find_packages(),
     tests_require=['pytest'],
-
-    classifiers=(
-        'Development Status :: 1 - Planning',
-        'License :: OSI Approved :: MIT',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3 :: Only'
-    ),
+    classifiers=('Development Status :: 1 - Planning',
+                 'License :: OSI Approved :: MIT',
+                 'Natural Language :: English',
+                 'Operating System :: OS Independent',
+                 'Programming Language :: Python :: 3.5',
+                 'Programming Language :: Python :: 3.6',
+                 'Programming Language :: Python :: 3.7',
+                 'Programming Language :: Python :: 3 :: Only'),
 )
