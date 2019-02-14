@@ -11,3 +11,7 @@ Include it in your project with:
 ## Usage
 
 The available variables are documented as properties of the [Config](pshconfig/config.py) class
+
+```python
+
+```
