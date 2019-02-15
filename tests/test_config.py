@@ -76,24 +76,6 @@ class ConfigTest(unittest.TestCase):
         config = Config(self.mockEnvironmentDeploy)
         self.assertFalse(config.in_build())
 
-    def _test_buildtime_properties_are_available(self):
-
-        config = Config(self.mockEnvironmentBuild)
-
-        self.assertEqual('/app', config.appDir)
-        self.assertEqual('app', config.applicationName)
-        self.assertEqual('test-project', config.project)
-        self.assertEqual('abc123', config.treeID)
-        self.assertEqual('def789', config.entropy)
-
-    def _test_runtime_properties_are_available(self):
-
-        config = Config(self.mockEnvironmentDeploy)
-
-        self.assertEqual('feature-x', config.branch)
-        self.assertEqual('feature-x-hgi456', config.environment)
-        self.assertEqual('/app/web', config.docRoot)
-
     def test_load_routes_in_runtime_works(self):
 
         config = Config(self.mockEnvironmentDeploy)
@@ -240,23 +222,32 @@ class ConfigTest(unittest.TestCase):
 
         config = Config(env)
 
-        self.assertTrue(hasattr(config, 'appDir'))
-        self.assertTrue(hasattr(config, 'applicationName'))
-        self.assertTrue(hasattr(config, 'project'))
-        self.assertTrue(hasattr(config, 'treeID'))
-        self.assertTrue(hasattr(config, 'entropy'))
-
         self.assertEqual('/app', config.appDir)
         self.assertEqual('app', config.applicationName)
         self.assertEqual('test-project', config.project)
         self.assertEqual('abc123', config.treeID)
         self.assertEqual('def789', config.entropy)
 
-    def test_build_and_deploy_properties_in_deploy_exists(self):
+        self.assertTrue(hasattr(config, 'appDir'))
+        self.assertTrue(hasattr(config, 'applicationName'))
+        self.assertTrue(hasattr(config, 'project'))
+        self.assertTrue(hasattr(config, 'treeID'))
+        self.assertTrue(hasattr(config, 'entropy'))
 
+    def test_build_and_deploy_properties_in_deploy_exists(self):
         env = self.mockEnvironmentDeploy
 
         config = Config(env)
+
+        self.assertEqual('/app', config.appDir)
+        self.assertEqual('app', config.applicationName)
+
+        self.assertEqual('feature-x-hgi456', config.environment)
+        self.assertEqual('/app/web', config.documentRoot)
+
+        self.assertEqual('1.2.3.4', config.smtpHost)
+        self.assertEqual('8080', config.port)
+        self.assertEqual('unix://tmp/blah.sock', config.socket)
 
         self.assertTrue(hasattr(config, 'appDir'))
         self.assertTrue(hasattr(config, 'applicationName'))
@@ -267,7 +258,10 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue(hasattr(config, 'branch'))
         self.assertTrue(hasattr(config, 'environment'))
         self.assertTrue(hasattr(config, 'documentRoot'))
+
         self.assertTrue(hasattr(config, 'smtpHost'))
+        self.assertTrue(hasattr(config, 'port'))
+        self.assertTrue(hasattr(config, 'socket'))
 
     def test_deploy_property_in_build_throws(self):
 
