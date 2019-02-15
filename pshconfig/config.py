@@ -63,6 +63,10 @@ class Config:
         smtpHost (string):
             The hostname of the Platform.sh default SMTP server (an empty string if emails are disabled on the
             environment.
+        port (string):
+            The TCP port number the application should listen to for incoming requests.
+        socket (string):
+            The Unix socket the application should listen to for incoming requests.
 
     .. Platform.sh Environment Variables
             https://docs.platform.sh/development/variables.html
@@ -82,6 +86,11 @@ class Config:
         "environment": "ENVIRONMENT",
         "documentRoot": "DOCUMENT_ROOT",
         "smtpHost": "SMTP_HOST"
+    }
+
+    unPrefixedVariablesRuntime = {
+        "port": "PORT",
+        "socket": "SOCKET"
     }
 
     environmentVariables = []
@@ -130,7 +139,6 @@ class Config:
 
         """
 
-        # return bool(self._get_value('APPLICATION_NAME'))
         return bool(self['APPLICATION_NAME'])
 
     def in_build(self):
@@ -370,6 +378,11 @@ class Config:
                 'not available.'.format(config_property))
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
+
+        # For now, all unprefixed variables are also runtime variables. If that ever changes this logic will change
+        # with it.
+        is_unprefixed_var = config_property in self.unPrefixedVariablesRuntime.keys()
+
         if self.in_build() and is_runtime_var:
             raise ValueError(
                 'The {} variable is not available during build time.'.format(
@@ -378,6 +391,8 @@ class Config:
             return self[self.directVariables[config_property]]
         if is_runtime_var:
             return self[self.directVariablesRuntime[config_property]]
+        if is_unprefixed_var:
+            return self.environmentVariables.get(self.unPrefixedVariablesRuntime[config_property])
         raise ValueError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
@@ -399,8 +414,12 @@ class Config:
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
 
+        # For now, all unprefixed variables are also runtime variables. If that ever changes this logic will change
+        # with it.
+        is_unprefixed_var = config_property in self.unPrefixedVariablesRuntime.keys()
+
         if self.in_build():
             return is_build_var and config_property is not None
-        if is_build_var or is_runtime_var:
-            return True and config_property is not None
+        if is_build_var or is_runtime_var or is_unprefixed_var:
+            return config_property is not None
         return False
