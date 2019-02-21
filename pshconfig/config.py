@@ -348,7 +348,7 @@ class Config:
 
         try:
             if sys.version_info[1] > 5:
-                return json.loads(base64.decodebytes(variable))
+                return json.loads(base64.b64decode(variable))
             else:
                 return json.loads(base64.decodebytes(variable).decode('utf-8'))
         except json.decoder.JSONDecodeError:
