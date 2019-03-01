@@ -5,7 +5,8 @@ import unittest
 
 from copy import deepcopy
 
-from pshconfig import Config
+from platformshconfig import Config
+
 
 class ConfigTest(unittest.TestCase):
 

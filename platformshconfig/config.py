@@ -7,6 +7,7 @@ __all__ = [
     "Config",
 ]
 
+
 class Config:
     """Reads Platform.sh configuration from environment variables.
 
@@ -350,7 +351,8 @@ class Config:
             if sys.version_info[1] > 5:
                 return json.loads(base64.b64decode(variable))
             else:
-                return json.loads(base64.decodebytes(variable).decode('utf-8'))
+                # return json.loads(base64.decodebytes(variable).decode('utf-8'))
+                return json.loads(base64.b64decode(variable).decode('utf-8'))
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
 

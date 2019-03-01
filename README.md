@@ -12,10 +12,10 @@ pip install git+https://github.com/platformsh/platformsh-config-reader-python3.g
 
 ## Usage
 
-The available variables are documented as properties of the [Config](pshconfig/config.py) class.
+The available variables are documented as properties of the [Config](platformshconfig/config.py) class.
 
 ```python
-from pshconfig import Config
+from platformshconfig import Config
 
 config = Config()
 

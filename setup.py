@@ -18,7 +18,7 @@ with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
 
 setup(
     version='0.1.0',
-    name='pshconfig',
+    name='platformshconfig',
     description='Small helper to access Platform.sh environment variables.',
     url='https://github.com/platformsh/platformsh-config-reader-python3',
     author='Platform.sh',
