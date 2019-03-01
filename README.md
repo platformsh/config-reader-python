@@ -1,4 +1,4 @@
-# pshconfig
+# platformshconfig
 
 [![Build Status](https://travis-ci.org/platformsh/platformsh-config-reader-python3.svg?branch=master)](https://travis-ci.org/platformsh/platformsh-config-reader-python3)
 
