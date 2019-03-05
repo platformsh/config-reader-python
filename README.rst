@@ -81,7 +81,7 @@ config.treeID
 config.projectEntropy
 ```
 
-The following are available only if `inRuntime()` returned `true`:
+The following are available only if `inRuntime()` returned `True`:
 
 ```python
 config.branch

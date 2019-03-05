@@ -187,7 +187,7 @@ class Config:
         Raises:
             RuntimeError:
                 Thrown if called in a context that has no relationships (eg, in build).
-            ValueError:
+            KeyError:
                 Thrown if the relationship/index pair requested does not exist.
 
         """
@@ -201,11 +201,11 @@ class Config:
                 'Relationships are not available during the build phase.'
             )
         if relationship not in self.relationshipsDef:
-            raise ValueError(
+            raise KeyError(
                 'No relationship defined: {}. Check your .platform.app.yaml file.'
                 .format(relationship))
         if index >= len(self.relationshipsDef):
-            raise ValueError('No index {} defined for relationship: {}.  '
+            raise KeyError('No index {} defined for relationship: {}.  '
                              'Check your .platform.app.yaml file.'.format(
                                  index, relationship))
         return self.relationshipsDef[relationship][index]
@@ -283,7 +283,7 @@ class Config:
             The route definition. The generated URL of the route is added as a 'url' key.
 
         Raises:
-            ValueError:
+            KeyError:
                 If there is no route by that ID, an exception is thrown.
 
         """
@@ -292,7 +292,7 @@ class Config:
             if route['id'] == route_id:
                 route['url'] = url
                 return route
-        raise ValueError('No such route id found: {}'.format(route_id))
+        raise KeyError('No such route id found: {}'.format(route_id))
 
     def application(self):
         """Returns the application definition array.
@@ -395,8 +395,6 @@ class Config:
 
         check_name = self.envPrefix + item.upper()
 
-        print(check_name)
-
         return self.environmentVariables.get(check_name)
         # try:
         #     return self.environmentVariables[check_name]
@@ -440,7 +438,7 @@ class Config:
         Raises:
             RuntimeError:
                 If not running on Platform.sh, and the variable is not found.
-            ValueError:
+            AttributeError:
                 If a variable is not found, or if decoding fails.
 
         """
@@ -498,7 +496,7 @@ class Config:
         return False
 
     @staticmethod
-    def pymongo_formatter(credentials):     # THIS WORKS, BUT THE HANDLING OF THE USERNAME/PW ARGS FIRST CLASS/KWARGS?
+    def pymongo_formatter(credentials):
         """Returns a DSN for a pymongo-MongoDB connection.
 
         Note that the username and password will still be needed separately in the constructor.
@@ -511,10 +509,7 @@ class Config:
             (string) A formatted pymongo DSN.
 
         """
-        return '{0}://{1}:{2}@{3}:{4}/{5}'.format(
-            credentials['scheme'],
-            credentials['username'],
-            credentials['password'],
+        return '{0}:{1}/{2}'.format(
             credentials['host'],
             credentials['port'],
             credentials['path']

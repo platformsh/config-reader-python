@@ -114,7 +114,7 @@ class ConfigTest(unittest.TestCase):
 
         config = Config(self.mockEnvironmentDeploy)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             config.get_route('missing')
 
     def test_onenterprise_returns_true_on_enterprise(self):
@@ -190,7 +190,7 @@ class ConfigTest(unittest.TestCase):
 
         config = Config(env)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             config.credentials('does-not-exist')
 
     def test_reading_existing_variable_works(self):
@@ -207,7 +207,7 @@ class ConfigTest(unittest.TestCase):
 
         config = Config(env)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(KeyError):
             config.credentials('database', 3)
 
     def test_reading_missing_variable_returns_default(self):
@@ -361,9 +361,7 @@ class ConfigTest(unittest.TestCase):
 
         formatted = config.formatted_credentials('mongodb', 'pymongo')
 
-        # missing 2 required positional arguments: 'username' and 'password'
-
-        self.assertEqual('mongodb://main:main@mongodb.internal:27017/main', formatted)  # include formatted string
+        self.assertEqual('mongodb.internal:27017/main', formatted)  # include formatted string
 
     @staticmethod
     def encode(value):
