@@ -149,7 +149,7 @@ class Config:
 
         """
 
-        return bool(self['APPLICATION_NAME'])
+        return 'APPLICATION_NAME' in self
 
     def in_build(self):
         """Checks whether the code is running in a build environment.
@@ -394,11 +394,6 @@ class Config:
         check_name = self.envPrefix + item.upper()
 
         return self.environmentVariables.get(check_name)
-        # print(item)
-        # try:
-        #     return self.environmentVariables[check_name]
-        # except KeyError:
-        #     raise KeyError
 
     @staticmethod
     def decode(variable):
@@ -423,6 +418,23 @@ class Config:
                 return json.loads(base64.b64decode(variable).decode('utf-8'))
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
+
+    def __contains__(self, item):
+        """Defines environment variable membership in Config.
+
+        Args:
+            item (string):
+                variable string to be judged.
+
+        Returns:
+            bool:
+                Returns True if Config contains the variable, False otherwise.
+
+        """
+
+        if self[item]:
+            return True
+        return False
 
     def __getattr__(self, config_property):
         """Gets a configuration property.
