@@ -10,14 +10,14 @@ from setuptools import setup, find_packages
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-with open('README.md', 'r', encoding='utf-8') as f:
+with open('README.rst', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
 
 with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
     __changelog__ = f.read()
 
 setup(
-    version='0.1.0',
+    version='2.0.0',
     name='platformshconfig',
     description='Small helper to access Platform.sh environment variables.',
     url='https://github.com/platformsh/platformsh-config-reader-python3',

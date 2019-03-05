@@ -6,6 +6,8 @@ import unittest
 from copy import deepcopy
 
 from platformshconfig import Config
+from platformshconfig import BuildTimeVariableAccessException
+from platformshconfig import NoCredentialFormatterFoundException
 
 
 class ConfigTest(unittest.TestCase):
@@ -77,6 +79,16 @@ class ConfigTest(unittest.TestCase):
         config = Config(self.mockEnvironmentDeploy)
         self.assertFalse(config.in_build())
 
+    def test_inruntime_in_runtime_is_true(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+        self.assertTrue(config.in_runtime())
+
+    def test_inruntime_inbuild_phase_is_false(self):
+
+        config = Config(self.mockEnvironmentBuild)
+        self.assertFalse(config.in_runtime())
+
     def test_load_routes_in_runtime_works(self):
 
         config = Config(self.mockEnvironmentDeploy)
@@ -88,7 +100,7 @@ class ConfigTest(unittest.TestCase):
 
         config = Config(self.mockEnvironmentBuild)
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(BuildTimeVariableAccessException):
             config.routes()
 
     def test_get_route_by_id_works(self):
@@ -227,13 +239,13 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual('app', config.applicationName)
         self.assertEqual('test-project', config.project)
         self.assertEqual('abc123', config.treeID)
-        self.assertEqual('def789', config.entropy)
+        self.assertEqual('def789', config.projectEntropy)
 
         self.assertTrue(hasattr(config, 'appDir'))
         self.assertTrue(hasattr(config, 'applicationName'))
         self.assertTrue(hasattr(config, 'project'))
         self.assertTrue(hasattr(config, 'treeID'))
-        self.assertTrue(hasattr(config, 'entropy'))
+        self.assertTrue(hasattr(config, 'projectEntropy'))
 
     def test_build_and_deploy_properties_in_deploy_exists(self):
         env = self.mockEnvironmentDeploy
@@ -242,10 +254,13 @@ class ConfigTest(unittest.TestCase):
 
         self.assertEqual('/app', config.appDir)
         self.assertEqual('app', config.applicationName)
+        self.assertEqual('test-project', config.project)
+        self.assertEqual('abc123', config.treeID)
+        self.assertEqual('def789', config.projectEntropy)
 
+        self.assertEqual('feature-x', config.branch)
         self.assertEqual('feature-x-hgi456', config.environment)
         self.assertEqual('/app/web', config.documentRoot)
-
         self.assertEqual('1.2.3.4', config.smtpHost)
         self.assertEqual('8080', config.port)
         self.assertEqual('unix://tmp/blah.sock', config.socket)
@@ -254,12 +269,11 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue(hasattr(config, 'applicationName'))
         self.assertTrue(hasattr(config, 'project'))
         self.assertTrue(hasattr(config, 'treeID'))
-        self.assertTrue(hasattr(config, 'entropy'))
+        self.assertTrue(hasattr(config, 'projectEntropy'))
 
         self.assertTrue(hasattr(config, 'branch'))
         self.assertTrue(hasattr(config, 'environment'))
         self.assertTrue(hasattr(config, 'documentRoot'))
-
         self.assertTrue(hasattr(config, 'smtpHost'))
         self.assertTrue(hasattr(config, 'port'))
         self.assertTrue(hasattr(config, 'socket'))
@@ -272,7 +286,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertFalse('branch' in dir(config))
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(BuildTimeVariableAccessException):
             branch = config.branch
 
     def test_missing_property_throws_in_build(self):
@@ -283,7 +297,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertFalse('missing' in dir(config))
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AttributeError):
             missing = config.missing
 
     def test_missing_property_throws_in_deploy(self):
@@ -294,7 +308,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertFalse('missing' in dir(config))
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AttributeError):
             missing = config.missing
 
     def test_application_array_available(self):
@@ -324,6 +338,32 @@ class ConfigTest(unittest.TestCase):
         config = Config({'FAKE_APPLICATION_NAME': 'test-application'}, 'FAKE_')
 
         self.assertTrue(config.is_valid_platform())
+
+    def test_formatted_credentials_throws_when_no_formatter_defined(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+
+        with self.assertRaises(NoCredentialFormatterFoundException):
+            config.formatted_credentials('database', 'not-defined')
+
+    def test_formatted_credentials_calls_a_formatter(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+
+        config.register_formatter('test', lambda credentials: 'called')
+        formatted = config.formatted_credentials('database', 'test')
+
+        self.assertEqual('called', formatted)
+
+    def test_pymongo_formatter(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+
+        formatted = config.formatted_credentials('mongodb', 'pymongo')
+
+        # missing 2 required positional arguments: 'username' and 'password'
+
+        self.assertEqual('mongodb://main:main@mongodb.internal:27017/main', formatted)  # include formatted string
 
     @staticmethod
     def encode(value):

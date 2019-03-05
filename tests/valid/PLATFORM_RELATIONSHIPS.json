@@ -38,5 +38,23 @@
          "cluster" : "dtsla3sy7euhc-master-7rqtwti",
          "scheme" : "http"
       }
+   ],
+   "mongodb" : [
+      {
+         "username": "main",
+         "scheme": "mongodb",
+         "service": "mongodb",
+         "ip": "169.254.106.124",
+         "hostname": "4y3jxad5eybbbq7vgdbddfj73q.mongodb.service._.eu-3.platformsh.site",
+         "cluster": "rjify4yjcwxaa-pythonexs-y2koaha",
+         "host": "mongodb.internal",
+         "rel": "mongodb",
+         "path": "main",
+         "query": {
+            "is_master": true
+         },
+         "password": "main",
+         "type": "mongodb:3.6",
+         "port": 27017 }
    ]
 }
