@@ -130,8 +130,8 @@ class Config:
                     relationships = self['RELATIONSHIPS']
                     self.relationshipsDef = self.decode(relationships)
 
-                self.register_formatter('pymongo', self.pymongo_formatter)
-                self.register_formatter('pysolr', self.pysolr_formatter)
+                self.register_formatter('pymongo', pymongo_formatter)
+                self.register_formatter('pysolr', pysolr_formatter)
 
             if self['VARIABLES']:
                 variables = self['VARIABLES']
@@ -150,8 +150,6 @@ class Config:
         """
 
         return bool(self['APPLICATION_NAME'])
-        # return 'APPLICATION_NAME' in self
-        # return 'APPLICATION_NAME' in self
 
     def in_build(self):
         """Checks whether the code is running in a build environment.
@@ -396,6 +394,7 @@ class Config:
         check_name = self.envPrefix + item.upper()
 
         return self.environmentVariables.get(check_name)
+        # print(item)
         # try:
         #     return self.environmentVariables[check_name]
         # except KeyError:
@@ -495,43 +494,43 @@ class Config:
             return config_property is not None
         return False
 
-    @staticmethod
-    def pymongo_formatter(credentials):
-        """Returns a DSN for a pymongo-MongoDB connection.
 
-        Note that the username and password will still be needed separately in the constructor.
+def pymongo_formatter(credentials):
+    """Returns a DSN for a pymongo-MongoDB connection.
 
-        Args:
-            credentials (dict):
-                The credentials dictionary from the relationships.
+    Note that the username and password will still be needed separately in the constructor.
 
-        Returns:
-            (string) A formatted pymongo DSN.
+    Args:
+        credentials (dict):
+            The credentials dictionary from the relationships.
 
-        """
-        return '{0}:{1}/{2}'.format(
-            credentials['host'],
-            credentials['port'],
-            credentials['path']
-        )
+    Returns:
+        (string) A formatted pymongo DSN.
 
-    @staticmethod
-    def pysolr_formatter(credentials):
-        """
-        Returns formatted Solr credentials for a pysolr-Solr connection.
+    """
+    return '{0}:{1}/{2}'.format(
+        credentials['host'],
+        credentials['port'],
+        credentials['path']
+    )
 
-        Args:
-            credentials (dict):
-                The credentials dictionary from the relationships.
 
-        Returns:
-            (string) A formatted pysolr credential.
+def pysolr_formatter(credentials):
+    """
+    Returns formatted Solr credentials for a pysolr-Solr connection.
 
-        """
+    Args:
+        credentials (dict):
+            The credentials dictionary from the relationships.
 
-        return "http://{0}:{1}/{2}".format(credentials['ip'],
-                                           credentials['port'],
-                                           credentials['path'])
+    Returns:
+        (string) A formatted pysolr credential.
+
+    """
+
+    return "http://{0}:{1}/{2}".format(credentials['ip'],
+                                       credentials['port'],
+                                       credentials['path'])
 
 
 class BuildTimeVariableAccessException(RuntimeError):
