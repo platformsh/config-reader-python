@@ -81,7 +81,7 @@ config.treeID
 config.projectEntropy
 ```
 
-The following are available only if `inRuntime()` returned `True`:
+The following are available only if `in_runtime()` returned `True`:
 
 ```python
 config.branch
@@ -105,7 +105,7 @@ config.port
 creds = config.credentials('database')
 ```
 
-The return value of `credentials()` is an associative array matching the relationship JSON object, which includes the appropriate user, password, host, database name, and other pertinent information.  See the [Service documentation](https://docs.platform.sh/configuration/services.html) for your service for the exact structure and meaning of each property.  In most cases that information can be passed directly to whatever other client library is being used to connect to the service.
+The return value of `credentials()` is a dictionary matching the relationship JSON object, which includes the appropriate user, password, host, database name, and other pertinent information.  See the [Service documentation](https://docs.platform.sh/configuration/services.html) for your service for the exact structure and meaning of each property.  In most cases that information can be passed directly to whatever other client library is being used to connect to the service.
 
 ## Formatting service credentials
 
@@ -128,7 +128,7 @@ The first parameter is the name of a relationship defined in `.platform.app.yaml
 
 Two formatters are included out of the box:
 
-* `pymongo` returns a DSN appropriate for using `pymongo` to connect to MongoDB. Note that `pymongo` will still need the username and password from the credentials array passed as separate parameters.
+* `pymongo` returns a DSN appropriate for using `pymongo` to connect to MongoDB. Note that `pymongo` will still need the username and password from the credentials dictionary passed as separate parameters.
 * `pysolr`  returns a DSN appropriate for using `pysolr` to connect to Apache Solr. 
 
 ### Reading Platform.sh variables
@@ -159,6 +159,6 @@ config.route("main")
 
 The `route()` method takes a single string for the route ID ("main" in this case) and returns the corresponding route array.  If the route is not found it will throw an exception.
 
-To access all routes, or to search for a route that has no ID, the `routes()` method returns an associative array of routes keyed by their URL.  That mirrors the structure of the `PLATFORM_ROUTES` environment variable.
+To access all routes, or to search for a route that has no ID, the `routes()` method returns an dictionary of routes keyed by their URL.  That mirrors the structure of the `PLATFORM_ROUTES` environment variable.
 
 If called in the build phase an exception is thrown.
