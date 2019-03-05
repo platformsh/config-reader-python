@@ -27,12 +27,14 @@ setup(
     long_description=__readme__ + '\n\n' + __changelog__,
     packages=find_packages(),
     tests_require=['pytest'],
-    classifiers=('Development Status :: 1 - Planning',
-                 'License :: OSI Approved :: MIT',
-                 'Natural Language :: English',
-                 'Operating System :: OS Independent',
-                 'Programming Language :: Python :: 3.5',
-                 'Programming Language :: Python :: 3.6',
-                 'Programming Language :: Python :: 3.7',
-                 'Programming Language :: Python :: 3 :: Only'),
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3 :: Only'
+    ],
 )
