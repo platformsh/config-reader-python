@@ -5,7 +5,12 @@ import base64
 
 __all__ = [
     "Config",
+    "BuildTimeVariableAccessException",
+    "NoCredentialFormatterFoundException",
+    "NotValidPlatformException"
+
 ]
+
 
 class Config:
     """Reads Platform.sh configuration from environment variables.
@@ -44,12 +49,12 @@ class Config:
             The project ID.
         applicationName (string):
             The name of the application, as defined in its configuration.
-        treeId (string):
+        treeID (string):
             An ID identifying the application tree before it was built: a unique hash is generated based on the contents
             of the application's files in the repository.
         appDir (string):
             The absolute path to the application.
-        entropy (string):
+        projectEntropy (string):
             A random string generated for each project, useful for generating hash keys.
 
         (The following properties are only available at runtime.)
@@ -78,7 +83,7 @@ class Config:
         "appDir": "APP_DIR",
         "applicationName": 'APPLICATION_NAME',
         "treeID": "TREE_ID",
-        "entropy": "PROJECT_ENTROPY"
+        "projectEntropy": "PROJECT_ENTROPY"
     }
 
     directVariablesRuntime = {
@@ -100,6 +105,7 @@ class Config:
     relationshipsDef = []
     variablesDef = []
     applicationDef = []
+    credentialFormatters = {}
 
     def __init__(self, environment_variables=None, env_prefix='PLATFORM_'):
         """Constructs a ConfigReader object.
@@ -116,13 +122,17 @@ class Config:
         self.envPrefix = env_prefix
 
         if self.is_valid_platform():
-            if not self.in_build():
+            if self.in_runtime():
                 if self['ROUTES']:
                     routes = self['ROUTES']
                     self.routesDef = self.decode(routes)
                 if self['RELATIONSHIPS']:
                     relationships = self['RELATIONSHIPS']
                     self.relationshipsDef = self.decode(relationships)
+
+                self.register_formatter('pymongo', pymongo_formatter)
+                self.register_formatter('pysolr', pysolr_formatter)
+
             if self['VARIABLES']:
                 variables = self['VARIABLES']
                 self.variablesDef = self.decode(variables)
@@ -139,7 +149,7 @@ class Config:
 
         """
 
-        return bool(self['APPLICATION_NAME'])
+        return 'APPLICATION_NAME' in self
 
     def in_build(self):
         """Checks whether the code is running in a build environment.
@@ -150,6 +160,15 @@ class Config:
         """
 
         return self.is_valid_platform() and not self['ENVIRONMENT']
+
+    def in_runtime(self):
+        """Checks whether the code is running in a runtime environment.
+
+        Returns:
+            bool: True if in a runtime environment, False otherwise.
+        """
+
+        return self.is_valid_platform() and self['ENVIRONMENT']
 
     def credentials(self, relationship, index=0):
         """Retrieves the credentials for accessing a relationship.
@@ -166,24 +185,25 @@ class Config:
         Raises:
             RuntimeError:
                 Thrown if called in a context that has no relationships (eg, in build).
-            ValueError:
+            KeyError:
                 Thrown if the relationship/index pair requested does not exist.
 
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError(
+            raise NotValidPlatformException(
                 'You are not running on Platform.sh, so relationships are not available.'
             )
         if self.in_build():
-            raise RuntimeError(
-                'Relationships are not available during the build phase.')
-        if relationship not in self.relationshipsDef.keys():
-            raise ValueError(
+            raise BuildTimeVariableAccessException(
+                'Relationships are not available during the build phase.'
+            )
+        if relationship not in self.relationshipsDef:
+            raise KeyError(
                 'No relationship defined: {}. Check your .platform.app.yaml file.'
                 .format(relationship))
-        if index not in range(len(self.relationshipsDef)):
-            raise ValueError('No index {} defined for relationship: {}.  '
+        if index >= len(self.relationshipsDef):
+            raise KeyError('No index {} defined for relationship: {}.  '
                              'Check your .platform.app.yaml file.'.format(
                                  index, relationship))
         return self.relationshipsDef[relationship][index]
@@ -223,7 +243,7 @@ class Config:
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError(
+            raise NotValidPlatformException(
                 'You are not running on Platform.sh, so the variables array is not available.'
             )
         return self.variablesDef
@@ -241,12 +261,13 @@ class Config:
 
         """
         if not self.is_valid_platform():
-            raise RuntimeError(
+            raise NotValidPlatformException(
                 'You are not running on Platform.sh, so routes are not available.'
             )
         if self.in_build():
-            raise RuntimeError(
-                'Routes are not available during the build phase.')
+            raise BuildTimeVariableAccessException(
+                'Routes are not available during the build phase.'
+            )
         return self.routesDef
 
     def get_route(self, route_id):
@@ -260,7 +281,7 @@ class Config:
             The route definition. The generated URL of the route is added as a 'url' key.
 
         Raises:
-            ValueError:
+            KeyError:
                 If there is no route by that ID, an exception is thrown.
 
         """
@@ -269,7 +290,7 @@ class Config:
             if route['id'] == route_id:
                 route['url'] = url
                 return route
-        raise ValueError('No such route id found: {}'.format(route_id))
+        raise KeyError('No such route id found: {}'.format(route_id))
 
     def application(self):
         """Returns the application definition array.
@@ -283,8 +304,8 @@ class Config:
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError(
-                'You are not running on Platform.sh, so the application definition are not available.'
+            raise NotValidPlatformException(
+                'You are not running on Platform.sh, so the application definitions are not available.'
             )
         return self.applicationDef
 
@@ -318,16 +339,60 @@ class Config:
         prod_branch = 'production' if self.on_enterprise() else 'master'
         return self['BRANCH'] == prod_branch
 
+    def register_formatter(self, name, formatter):
+        """Adds a credential formatter to the configuration.
+
+        A credential formatter is responsible for formatting the credentials for a relationship in a way expected
+        by a particular client library. For instance, it can take the credentials from Platform.sh for a MongoDB
+        database and format them into a URL string expected by pymongo. Use the formatted credentials() method to
+        get the formatted  version of a particular relationship.
+
+        Args:
+            name (string):
+                The name of the formatter. This may be an arbitrary alphanumeric string.
+            formatter (callable):
+                A callback function that will format relationship credentials for a specific client library.
+
+        Returns:
+            Config. The called object, for chaining.
+
+        """
+
+        self.credentialFormatters[name] = formatter
+        return self
+
+    def formatted_credentials(self, relationship, formatter):
+        """Returns credentials for the specified relationship as formatted by the specified formatter.
+
+        Args:
+            relationship (string):
+            formatter (string):
+
+        Returns:
+            The credentials formatted with the given formatter.
+
+        Raises:
+            NoCredentialFormatterFoundException
+
+        """
+        if formatter not in self.credentialFormatters:
+            raise NoCredentialFormatterFoundException(
+                'There is no credential formatter named {0} registered. Did you remember to call register_formatter()?'
+                .format(formatter)
+            )
+        return self.credentialFormatters[formatter](self.credentials(relationship))
+
     def __getitem__(self, item):
         """Reads an environment variable, taking the prefix into account.
 
         Args:
-            name (string):
+            item (string):
                 The variable to read.
 
         """
 
         check_name = self.envPrefix + item.upper()
+
         return self.environmentVariables.get(check_name)
 
     @staticmethod
@@ -350,9 +415,26 @@ class Config:
             if sys.version_info[1] > 5:
                 return json.loads(base64.b64decode(variable))
             else:
-                return json.loads(base64.decodebytes(variable).decode('utf-8'))
+                return json.loads(base64.b64decode(variable).decode('utf-8'))
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
+
+    def __contains__(self, item):
+        """Defines environment variable membership in Config.
+
+        Args:
+            item (string):
+                variable string to be judged.
+
+        Returns:
+            bool:
+                Returns True if Config contains the variable, False otherwise.
+
+        """
+
+        if self[item]:
+            return True
+        return False
 
     def __getattr__(self, config_property):
         """Gets a configuration property.
@@ -367,15 +449,15 @@ class Config:
         Raises:
             RuntimeError:
                 If not running on Platform.sh, and the variable is not found.
-            ValueError:
+            AttributeError:
                 If a variable is not found, or if decoding fails.
 
         """
 
         if not self.is_valid_platform():
-            raise RuntimeError(
-                'You are not running on Platform.sh, so the {} variable is '
-                'not available.'.format(config_property))
+            raise NotValidPlatformException(
+                'You are not running on Platform.sh, so the {0} variable is not available.'.format(config_property)
+            )
         is_build_var = config_property in self.directVariables.keys()
         is_runtime_var = config_property in self.directVariablesRuntime.keys()
 
@@ -384,16 +466,16 @@ class Config:
         is_unprefixed_var = config_property in self.unPrefixedVariablesRuntime.keys()
 
         if self.in_build() and is_runtime_var:
-            raise ValueError(
-                'The {} variable is not available during build time.'.format(
-                    config_property))
+            raise BuildTimeVariableAccessException(
+                'The {0} variable is not available during build time.'.format(config_property)
+            )
         if is_build_var:
             return self[self.directVariables[config_property]]
         if is_runtime_var:
             return self[self.directVariablesRuntime[config_property]]
         if is_unprefixed_var:
             return self.environmentVariables.get(self.unPrefixedVariablesRuntime[config_property])
-        raise ValueError('No such variable defined: '.format(config_property))
+        raise AttributeError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
         """Checks whether a configuration property is set.
@@ -423,3 +505,53 @@ class Config:
         if is_build_var or is_runtime_var or is_unprefixed_var:
             return config_property is not None
         return False
+
+
+def pymongo_formatter(credentials):
+    """Returns a DSN for a pymongo-MongoDB connection.
+
+    Note that the username and password will still be needed separately in the constructor.
+
+    Args:
+        credentials (dict):
+            The credentials dictionary from the relationships.
+
+    Returns:
+        (string) A formatted pymongo DSN.
+
+    """
+    return '{0}:{1}/{2}'.format(
+        credentials['host'],
+        credentials['port'],
+        credentials['path']
+    )
+
+
+def pysolr_formatter(credentials):
+    """
+    Returns formatted Solr credentials for a pysolr-Solr connection.
+
+    Args:
+        credentials (dict):
+            The credentials dictionary from the relationships.
+
+    Returns:
+        (string) A formatted pysolr credential.
+
+    """
+
+    return "http://{0}:{1}/{2}".format(credentials['ip'],
+                                       credentials['port'],
+                                       credentials['path'])
+
+
+class BuildTimeVariableAccessException(RuntimeError):
+    pass
+
+
+class NoCredentialFormatterFoundException(ValueError):
+    pass
+
+
+class NotValidPlatformException(RuntimeError):
+    pass
