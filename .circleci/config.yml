@@ -15,22 +15,21 @@ jobs:
       - checkout
 #      - run: sudo chown -R circleci:circleci /usr/local/bin
 #      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-      - restore_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+#      - restore_cache:
+#          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
             sudo pip install pipenv
-            pip install pytest
             pipenv install
-      - save_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+#      - save_cache:
+#          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            pipenv run "pytest"
+            pipenv run "tests/test_config.py"
 #      - store_test_results:
 #          path: test-results
 #      - store_artifacts:
