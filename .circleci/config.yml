@@ -27,9 +27,9 @@ jobs:
       - checkout
       - restore_cache:  # ensure this step occurs *before* installing dependencies
           keys:
-            - v2-dependency-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-            - v2-dependency-cache-{{ .Branch }}-
-            - v2-dependency-cache-
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-
       - run:
           command: |
             pip install --user pipenv
@@ -38,7 +38,7 @@ jobs:
           paths:
             - ".venv"
             - ~/.local/share/virtualenvs/
-          key: v2-dependency-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
             pipenv run "pytest"
@@ -53,9 +53,9 @@ jobs:
       - checkout
       - restore_cache:  # ensure this step occurs *before* installing dependencies
           keys:
-            - v2-dependency-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-            - v2-dependency-cache-{{ .Branch }}-
-            - v2-dependency-cache-
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-
       - run:
           command: |
             pip install --user pipenv
@@ -64,7 +64,7 @@ jobs:
           paths:
             - ".venv"
             - ~/.local/share/virtualenvs/
-          key: v2-dependency-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: verify git tag vs. version
           command: |
