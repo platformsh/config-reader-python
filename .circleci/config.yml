@@ -1,4 +1,20 @@
 version: 2
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
 jobs:
   build:
     working_directory: ~/config-reader-python3
@@ -24,3 +40,42 @@ jobs:
       - run:
           command: |
             pipenv run "pytest"
+  deploy:
+    working_directory: ~/config-reader-python3
+    docker:
+      - image: circleci/python:3.6.4
+        environment:
+          PIPENV_VENV_IN_PROJECT: true
+
+    steps:
+      - checkout
+      - restore_cache:  # ensure this step occurs *before* installing dependencies
+          key: v2_0_0-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      - run:
+          command: |
+            sudo pip install pipenv
+            pipenv install
+      - save_cache:
+          key: v2_0_0-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.6/site-packages"
+      - run:
+          name: verify git tag vs. version
+          command: |
+            pipenv run python setup.py verify
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+          name: create packages
+          command: |
+            pipenv run python setup.py sdist bdist_wheel
+      - run:
+          name: upload to pypi
+          command: |
+            pipenv run twine upload dist/*
