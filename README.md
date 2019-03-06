@@ -118,7 +118,7 @@ def format_my_service(credentials):
     return "some string based on 'credentials'."
 
 # Call this in setup
-config.register_formatter('my_service', 'forma_my_service')
+config.register_formatter('my_service', 'format_my_service')
 
 # Then call this method to get the formatted version
 formatted = config.formatted_credentials('database', 'my_service')
