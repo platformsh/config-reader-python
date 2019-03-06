@@ -26,17 +26,19 @@ jobs:
     steps:
       - checkout
       - restore_cache:  # ensure this step occurs *before* installing dependencies
-          key: v2-dependency-cache-{{ .Branch }}-{{ checksum "setup.py" }}-{{ checksum "Pipfile.lock" }}
+          keys:
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-
       - run:
           command: |
-            sudo pip install pipenv
+            pip install --user pipenv
             pipenv install
       - save_cache:
-          key: v2-dependency-cache-{{ .Branch }}-{{ checksum "setup.py" }}-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.6/site-packages"
+            - ~/.local/share/virtualenvs/
+          key: v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
             pipenv run "pytest"
@@ -50,17 +52,19 @@ jobs:
     steps:
       - checkout
       - restore_cache:  # ensure this step occurs *before* installing dependencies
-          key: v2-dependency-cache-{{ .Branch }}-{{ checksum "setup.py" }}-{{ checksum "Pipfile.lock" }}
+          keys:
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-
+            - v{{ .Environment.CACHE_VERSION }}-dep-cache-
       - run:
           command: |
-            sudo pip install pipenv
+            pip install --user pipenv
             pipenv install
       - save_cache:
-          key: v2-dependency-cache-{{ .Branch }}-{{ checksum "setup.py" }}-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.6/site-packages"
+            - ~/.local/share/virtualenvs/
+          key: v{{ .Environment.CACHE_VERSION }}-dep-cache-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: verify git tag vs. version
           command: |
