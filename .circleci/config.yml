@@ -9,12 +9,14 @@ jobs:
 
     steps:
       - checkout
+      - restore_cache:  # ensure this step occurs *before* installing dependencies
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
             sudo pip install pipenv
-            python setup.py install
-#      - save_cache:
-#          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+            pipenv install
+      - save_cache:
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
             - "/usr/local/bin"
