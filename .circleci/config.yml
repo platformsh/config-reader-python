@@ -20,6 +20,7 @@ jobs:
       - run:
           command: |
             sudo pip install pipenv
+            pip install pytest
             pipenv install
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
@@ -29,7 +30,7 @@ jobs:
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            pipenv run "python pytest"
+            pipenv run "pytest"
 #      - store_test_results:
 #          path: test-results
 #      - store_artifacts:
