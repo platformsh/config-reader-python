@@ -29,7 +29,7 @@ jobs:
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            pipenv run "tests/test_config.py"
+            pipenv run "python tests/test_config.py"
 #      - store_test_results:
 #          path: test-results
 #      - store_artifacts:
