@@ -248,7 +248,6 @@ class Config:
             )
         return self.variablesDef
 
-    @property
     def routes(self):
         """Return the routes definition.
 
