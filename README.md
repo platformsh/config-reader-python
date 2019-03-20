@@ -1,5 +1,7 @@
 # Platform.sh Config Reader (Python)
 
+[![CircleCI Status](https://circleci.com/gh/platformsh/config-reader-python.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/platformsh/config-reader-python)
+
 This library provides a streamlined and easy to use way to interact with a Platform.sh environment. It offers utility methods to access routes and relationships more cleanly than reading the raw environment variables yourself.
 
 This library requires Python 3.5 or later.
