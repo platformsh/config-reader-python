@@ -92,7 +92,7 @@ class ConfigTest(unittest.TestCase):
     def test_load_routes_in_runtime_works(self):
 
         config = Config(self.mockEnvironmentDeploy)
-        routes = config.routes
+        routes = config.routes()
 
         self.assertTrue(isinstance(routes, dict))
 

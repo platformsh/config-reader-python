@@ -248,7 +248,6 @@ class Config:
             )
         return self.variablesDef
 
-    @property
     def routes(self):
         """Return the routes definition.
 
@@ -286,7 +285,7 @@ class Config:
 
         """
 
-        for (url, route) in self.routes.items():
+        for (url, route) in self.routes().items():
             if route['id'] == route_id:
                 route['url'] = url
                 return route
