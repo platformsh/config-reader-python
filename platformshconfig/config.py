@@ -381,6 +381,21 @@ class Config:
             )
         return self.credentialFormatters[formatter](self.credentials(relationship))
 
+
+    def has_relationship(self, relationship):
+        """Determines if a relationship is defined, and thus has credentials available.
+
+        Args:
+            relationship (string):
+                The name of the relationship to check.
+
+        Returns:
+            bool:
+                True if the relationship is defined, False otherwise.
+
+        """
+        return relationship in self.relationshipsDef
+
     def __getitem__(self, item):
         """Reads an environment variable, taking the prefix into account.
 

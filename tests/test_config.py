@@ -193,14 +193,6 @@ class ConfigTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             config.credentials('does-not-exist')
 
-    def test_reading_existing_variable_works(self):
-
-        env = self.mockEnvironmentDeploy
-
-        config = Config(env)
-
-        self.assertEqual('someval', config.variable('somevar'))
-
     def test_credentials_missing_relationship_index_throws(self):
 
         env = self.mockEnvironmentDeploy
@@ -209,6 +201,30 @@ class ConfigTest(unittest.TestCase):
 
         with self.assertRaises(KeyError):
             config.credentials('database', 3)
+
+    def test_has_relationship_returns_true_for_existing_relationship(self):
+
+        env = self.mockEnvironmentDeploy
+
+        config = Config(env)
+
+        self.assertTrue(config.has_relationship('database'))
+
+    def test_has_relationship_returns_false_for_missing_relationship(self):
+
+        env = self.mockEnvironmentDeploy
+
+        config = Config(env)
+
+        self.assertFalse(config.has_relationship('missing'))
+
+    def test_reading_existing_variable_works(self):
+
+        env = self.mockEnvironmentDeploy
+
+        config = Config(env)
+
+        self.assertEqual('someval', config.variable('somevar'))
 
     def test_reading_missing_variable_returns_default(self):
 
