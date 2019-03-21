@@ -61,7 +61,7 @@ class Config:
     runtime). The key is the property that will be read. The value is the environment variables, minus prefix,
     that contains the value to look up.
     """
-    directVariables = {
+    _directVariables = {
         "project": "PROJECT",
         "appDir": "APP_DIR",
         "applicationName": 'APPLICATION_NAME',
@@ -74,14 +74,14 @@ class Config:
     (runtime only). The key is the property that will be read. The value is the environment variables, minus
     prefix, that contains the value to look up.
     """
-    directVariablesRuntime = {
+    _directVariablesRuntime = {
         "branch": "BRANCH",
         "environment": "ENVIRONMENT",
         "documentRoot": "DOCUMENT_ROOT",
         "smtpHost": "SMTP_HOST"
     }
 
-    unPrefixedVariablesRuntime = {
+    _unPrefixedVariablesRuntime = {
         "port": "PORT",
         "socket": "SOCKET"
     }
@@ -89,35 +89,35 @@ class Config:
     """
     A local copy of all environment variables as of when the object was initialized.
     """
-    environmentVariables = []
+    _environmentVariables = []
 
     """
     The vendor prefix for all environment variables we care about.
     """
-    envPrefix = ''
+    _envPrefix = ''
 
     """
     The routes definition array. Only available at runtime.
     """
-    routesDef = []
+    _routesDef = []
 
     """
     The relationships definition array. Only available at runtime.
     """
-    relationshipsDef = []
+    _relationshipsDef = []
 
     """
     The variables definition array. Available in both build and runtime, although possibly with different
     values.
     """
-    variablesDef = []
+    _variablesDef = []
 
     """
     The application definition array. This is, approximately, the .platform.app.yaml file in nested dictionary form.
     """
-    applicationDef = []
+    _applicationDef = []
 
-    credentialFormatters = {}
+    _credentialFormatters = {}
 
     def __init__(self, environment_variables=None, env_prefix='PLATFORM_'):
         """Constructs a ConfigReader object.
@@ -130,27 +130,27 @@ class Config:
 
         """
 
-        self.environmentVariables = os.environ if environment_variables is None else environment_variables
-        self.envPrefix = env_prefix
+        self._environmentVariables = os.environ if environment_variables is None else environment_variables
+        self._envPrefix = env_prefix
 
         if self.is_valid_platform():
             if self.in_runtime():
                 if self['ROUTES']:
                     routes = self['ROUTES']
-                    self.routesDef = self.decode(routes)
+                    self._routesDef = self.decode(routes)
                 if self['RELATIONSHIPS']:
                     relationships = self['RELATIONSHIPS']
-                    self.relationshipsDef = self.decode(relationships)
+                    self._relationshipsDef = self.decode(relationships)
 
                 self.register_formatter('pymongo', pymongo_formatter)
                 self.register_formatter('pysolr', pysolr_formatter)
 
             if self['VARIABLES']:
                 variables = self['VARIABLES']
-                self.variablesDef = self.decode(variables)
+                self._variablesDef = self.decode(variables)
             if self['APPLICATION']:
                 application = self['APPLICATION']
-                self.applicationDef = self.decode(application)
+                self._applicationDef = self.decode(application)
 
     def is_valid_platform(self):
         """Checks whether the code is running on a platform with valid environment variables.
@@ -210,15 +210,15 @@ class Config:
             raise BuildTimeVariableAccessException(
                 'Relationships are not available during the build phase.'
             )
-        if relationship not in self.relationshipsDef:
+        if relationship not in self._relationshipsDef:
             raise KeyError(
                 'No relationship defined: {}. Check your .platform.app.yaml file.'
                 .format(relationship))
-        if index >= len(self.relationshipsDef):
+        if index >= len(self._relationshipsDef):
             raise KeyError('No index {} defined for relationship: {}.  '
                              'Check your .platform.app.yaml file.'.format(
                                  index, relationship))
-        return self.relationshipsDef[relationship][index]
+        return self._relationshipsDef[relationship][index]
 
     def variable(self, name, default=None):
         """Returns a variable from the VARIABLES array.
@@ -241,7 +241,7 @@ class Config:
 
         if not self.is_valid_platform():
             return default
-        return self.variablesDef.get(name, default)
+        return self._variablesDef.get(name, default)
 
     def variables(self):
         """Returns the full variables array.
@@ -258,7 +258,7 @@ class Config:
             raise NotValidPlatformException(
                 'You are not running on Platform.sh, so the variables array is not available.'
             )
-        return self.variablesDef
+        return self._variablesDef
 
     @property
     def routes(self):
@@ -280,7 +280,7 @@ class Config:
             raise BuildTimeVariableAccessException(
                 'Routes are not available during the build phase.'
             )
-        return self.routesDef
+        return self._routesDef
 
     def get_route(self, route_id):
         """Get route definition by route ID.
@@ -319,7 +319,7 @@ class Config:
             raise NotValidPlatformException(
                 'You are not running on Platform.sh, so the application definitions are not available.'
             )
-        return self.applicationDef
+        return self._applicationDef
 
     def on_enterprise(self):
         """Determines if the current environment is a Platform.sh Enterprise environment.
@@ -370,7 +370,7 @@ class Config:
 
         """
 
-        self.credentialFormatters[name] = formatter
+        self._credentialFormatters[name] = formatter
         return self
 
     def formatted_credentials(self, relationship, formatter):
@@ -387,12 +387,12 @@ class Config:
             NoCredentialFormatterFoundException
 
         """
-        if formatter not in self.credentialFormatters:
+        if formatter not in self._credentialFormatters:
             raise NoCredentialFormatterFoundException(
                 'There is no credential formatter named {0} registered. Did you remember to call register_formatter()?'
                 .format(formatter)
             )
-        return self.credentialFormatters[formatter](self.credentials(relationship))
+        return self._credentialFormatters[formatter](self.credentials(relationship))
 
     def __getitem__(self, item):
         """Reads an environment variable, taking the prefix into account.
@@ -403,9 +403,9 @@ class Config:
 
         """
 
-        check_name = self.envPrefix + item.upper()
+        check_name = self._envPrefix + item.upper()
 
-        return self.environmentVariables.get(check_name)
+        return self._environmentVariables.get(check_name)
 
     @staticmethod
     def decode(variable):
@@ -470,23 +470,23 @@ class Config:
             raise NotValidPlatformException(
                 'You are not running on Platform.sh, so the {0} variable is not available.'.format(config_property)
             )
-        is_build_var = config_property in self.directVariables.keys()
-        is_runtime_var = config_property in self.directVariablesRuntime.keys()
+        is_build_var = config_property in self._directVariables.keys()
+        is_runtime_var = config_property in self._directVariablesRuntime.keys()
 
         # For now, all unprefixed variables are also runtime variables. If that ever changes this logic will change
         # with it.
-        is_unprefixed_var = config_property in self.unPrefixedVariablesRuntime.keys()
+        is_unprefixed_var = config_property in self._unPrefixedVariablesRuntime.keys()
 
         if self.in_build() and is_runtime_var:
             raise BuildTimeVariableAccessException(
                 'The {0} variable is not available during build time.'.format(config_property)
             )
         if is_build_var:
-            return self[self.directVariables[config_property]]
+            return self[self._directVariables[config_property]]
         if is_runtime_var:
-            return self[self.directVariablesRuntime[config_property]]
+            return self[self._directVariablesRuntime[config_property]]
         if is_unprefixed_var:
-            return self.environmentVariables.get(self.unPrefixedVariablesRuntime[config_property])
+            return self._environmentVariables.get(self._unPrefixedVariablesRuntime[config_property])
         raise AttributeError('No such variable defined: '.format(config_property))
 
     def isset(self, config_property):
@@ -505,12 +505,12 @@ class Config:
         if not self.is_valid_platform():
             return False
 
-        is_build_var = config_property in self.directVariables.keys()
-        is_runtime_var = config_property in self.directVariablesRuntime.keys()
+        is_build_var = config_property in self._directVariables.keys()
+        is_runtime_var = config_property in self._directVariablesRuntime.keys()
 
         # For now, all unprefixed variables are also runtime variables. If that ever changes this logic will change
         # with it.
-        is_unprefixed_var = config_property in self.unPrefixedVariablesRuntime.keys()
+        is_unprefixed_var = config_property in self._unPrefixedVariablesRuntime.keys()
 
         if self.in_build():
             return is_build_var and config_property is not None
