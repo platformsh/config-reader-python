@@ -21,28 +21,6 @@ class Config:
     existence with hasattr(config, variableName). Attempting to access a nonexistent variable will throw an exception.
 
     Attributes:
-        directVariables (dict):
-            Local index of the variables that can be accessed as direct properties (build and
-            runtime). The key is the property that will be read. The value is the environment variables, minus prefix,
-            that contains the value to look up.
-        directVariablesRuntime (dict):
-            Local index of the variables that can be accessed as direct properties
-            (runtime only). The key is the property that will be read. The value is the environment variables, minus
-            prefix, that contains the value to look up.
-        environmentVariables (dict):
-            A local copy of all environment variables as of when the object was initialized.
-        envPrefix (string):
-            The vendor prefix for all environment variables we care about.
-        routesDef (dict):
-            The routes definition array. Only available at runtime.
-        relationshipsDef (dict):
-            The relationships definition array. Only available at runtime.
-        variablesDef (dict):
-            The variables definition array. Available in both build and runtime, although possibly with different
-            values.
-        applicationDef (dict):
-            The application definition array. This is, approximately, the .platform.app.yaml file in nested array form.
-
         (The following properties are available at build time and run time.)
 
         project (string):
@@ -78,6 +56,11 @@ class Config:
 
     """
 
+    """
+    Local index of the variables that can be accessed as direct properties (build and
+    runtime). The key is the property that will be read. The value is the environment variables, minus prefix,
+    that contains the value to look up.
+    """
     directVariables = {
         "project": "PROJECT",
         "appDir": "APP_DIR",
@@ -86,6 +69,11 @@ class Config:
         "projectEntropy": "PROJECT_ENTROPY"
     }
 
+    """
+    Local index of the variables that can be accessed as direct properties
+    (runtime only). The key is the property that will be read. The value is the environment variables, minus
+    prefix, that contains the value to look up.
+    """
     directVariablesRuntime = {
         "branch": "BRANCH",
         "environment": "ENVIRONMENT",
@@ -98,13 +86,37 @@ class Config:
         "socket": "SOCKET"
     }
 
+    """
+    A local copy of all environment variables as of when the object was initialized.
+    """
     environmentVariables = []
+
+    """
+    The vendor prefix for all environment variables we care about.
+    """
     envPrefix = ''
 
+    """
+    The routes definition array. Only available at runtime.
+    """
     routesDef = []
+
+    """
+    The relationships definition array. Only available at runtime.
+    """
     relationshipsDef = []
+
+    """
+    The variables definition array. Available in both build and runtime, although possibly with different
+    values.
+    """
     variablesDef = []
+
+    """
+    The application definition array. This is, approximately, the .platform.app.yaml file in nested dictionary form.
+    """
     applicationDef = []
+
     credentialFormatters = {}
 
     def __init__(self, environment_variables=None, env_prefix='PLATFORM_'):
