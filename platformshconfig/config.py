@@ -81,6 +81,9 @@ class Config:
         "smtpHost": "SMTP_HOST"
     }
 
+    """
+    Local index of variables available at runtime that have no prefix.
+    """
     _unPrefixedVariablesRuntime = {
         "port": "PORT",
         "socket": "SOCKET"
@@ -117,6 +120,9 @@ class Config:
     """
     _applicationDef = []
 
+    """
+    A map of the registered credential formatters.  The key is the name, the value is a function.
+    """
     _credentialFormatters = {}
 
     def __init__(self, environment_variables=None, env_prefix='PLATFORM_'):
