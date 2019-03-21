@@ -20,7 +20,7 @@ setup(
     version='2.0.0',
     name='platformshconfig',
     description='Small helper to access Platform.sh environment variables.',
-    url='https://github.com/platformsh/platformsh-config-reader-python3',
+    url='https://github.com/platformsh/config-reader-python3',
     author='Platform.sh',
     author_email='sayhello@platform.sh',
     license='MIT',
