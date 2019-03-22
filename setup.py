@@ -2,6 +2,7 @@
 
 """setup.py: setuptools control."""
 
+import sys
 import os.path
 
 from codecs import open
