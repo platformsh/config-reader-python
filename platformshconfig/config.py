@@ -100,25 +100,25 @@ class Config:
     _envPrefix = ''
 
     """
-    The routes definition array. Only available at runtime.
+    The routes definition dict. Only available at runtime.
     """
-    _routesDef = []
+    _routesDef = {}
 
     """
-    The relationships definition array. Only available at runtime.
+    The relationships definition dict. Only available at runtime.
     """
-    _relationshipsDef = []
+    _relationshipsDef = {}
 
     """
-    The variables definition array. Available in both build and runtime, although possibly with different
+    The variables definition dict. Available in both build and runtime, although possibly with different
     values.
     """
-    _variablesDef = []
+    _variablesDef = {}
 
     """
-    The application definition array. This is, approximately, the .platform.app.yaml file in nested dictionary form.
+    The application definition dict. This is, approximately, the .platform.app.yaml file in nested dictionary form.
     """
-    _applicationDef = []
+    _applicationDef = {}
 
     """
     A map of the registered credential formatters.  The key is the name, the value is a function.
@@ -198,7 +198,7 @@ class Config:
                 The index within the relationship to access. This is always 0, but reserved for future extension.
 
         Returns:
-            The credentials array for the service pointed to by the relationship.
+            The credentials dict for the service pointed to by the relationship.
 
         Raises:
             RuntimeError:
@@ -227,7 +227,7 @@ class Config:
         return self._relationshipsDef[relationship][index]
 
     def variable(self, name, default=None):
-        """Returns a variable from the VARIABLES array.
+        """Returns a variable from the VARIABLES dict.
 
         Note:
             Variables prefixed with `env`: can be accessed as normal environment variables. This method will return
@@ -241,7 +241,7 @@ class Config:
                 The default value to return if the variable is not defined. Defaults to None.
 
         Returns:
-            The value of the variable, or the specified default. This may be a string or an array.
+            The value of the variable, or the specified default. This may be a string or a dict.
 
         """
 
@@ -250,19 +250,19 @@ class Config:
         return self._variablesDef.get(name, default)
 
     def variables(self):
-        """Returns the full variables array.
+        """Returns the full variables dict.
 
         If you're looking for a specific variable, the variable() method is a more robust option.
         This method is for classes where you want to scan the whole variables list looking for a pattern.
 
         Returns:
-            The full variables array.
+            The full variables dict.
 
         """
 
         if not self.is_valid_platform():
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so the variables array is not available.'
+                'You are not running on Platform.sh, so the variables dict is not available.'
             )
         return self._variablesDef
 
@@ -270,7 +270,7 @@ class Config:
         """Return the routes definition.
 
         Returns:
-            The routes array.
+            The routes dict.
 
         Raises:
             RuntimeError:
@@ -310,13 +310,13 @@ class Config:
         raise KeyError('No such route id found: {}'.format(route_id))
 
     def application(self):
-        """Returns the application definition array.
+        """Returns the application definition dict.
 
-        This is, approximately, the .platform.app.yaml file as a nested array. However, it also has other information
+        This is, approximately, the .platform.app.yaml file as a nested dict. However, it also has other information
         added by Platform.sh as part of the build and deploy process.
 
         Returns:
-            The application definition array.
+            The application definition dict.
 
         """
 
@@ -412,7 +412,7 @@ class Config:
                 True if the relationship is defined, False otherwise.
 
         """
-        return relationship in self.relationshipsDef
+        return relationship in self._relationshipsDef
 
     def __getitem__(self, item):
         """Reads an environment variable, taking the prefix into account.
@@ -436,7 +436,7 @@ class Config:
                 Base64-encoded JSON (the content of an environment variable).
 
         Returns:
-            An associative array (if representing a JSON object), or a scalar type.
+            An dict (if representing a JSON object), or a scalar type.
 
         Raises:
             JSON decoding error.
