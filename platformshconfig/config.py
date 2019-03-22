@@ -241,7 +241,7 @@ class Config:
                 The default value to return if the variable is not defined. Defaults to None.
 
         Returns:
-            The value of the variable, or the specified default. This may be a string or an dict.
+            The value of the variable, or the specified default. This may be a string or a dict.
 
         """
 
@@ -436,7 +436,7 @@ class Config:
                 Base64-encoded JSON (the content of an environment variable).
 
         Returns:
-            An associative dict (if representing a JSON object), or a scalar type.
+            An dict (if representing a JSON object), or a scalar type.
 
         Raises:
             JSON decoding error.
