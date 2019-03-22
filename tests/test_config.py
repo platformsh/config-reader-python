@@ -89,16 +89,12 @@ class ConfigTest(unittest.TestCase):
         config = Config(self.mockEnvironmentBuild)
         self.assertFalse(config.in_runtime())
 
-
-
     def test_load_routes_in_runtime_works(self):
 
         config = Config(self.mockEnvironmentDeploy)
         routes = config.routes()
 
         self.assertTrue(isinstance(routes, dict))
-
-
 
     def test_load_routes_in_build_fails(self):
 
