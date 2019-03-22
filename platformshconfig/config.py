@@ -102,7 +102,7 @@ class Config:
     """
     The routes definition array. Only available at runtime.
     """
-    _routesDef = []
+    _routesDef = {}
 
     """
     The relationships definition array. Only available at runtime.
@@ -412,7 +412,7 @@ class Config:
                 True if the relationship is defined, False otherwise.
 
         """
-        return relationship in self.relationshipsDef
+        return relationship in self._relationshipsDef
 
     def __getitem__(self, item):
         """Reads an environment variable, taking the prefix into account.
