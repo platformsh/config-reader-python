@@ -150,6 +150,7 @@ class Config:
 
                 self.register_formatter('pymongo', pymongo_formatter)
                 self.register_formatter('pysolr', pysolr_formatter)
+                self.register_formatter('postgresql_dsn', posgresql_dsn_formatter)
 
             if self['VARIABLES']:
                 variables = self['VARIABLES']
@@ -576,6 +577,24 @@ def pysolr_formatter(credentials):
                                        credentials['port'],
                                        credentials['path'])
 
+
+def posgresql_dsn_formatter(credentials):
+    """
+    Returns formatted Posgresql credentials as DSN.
+
+    Args:
+        credentials (dict):
+            The credentials dictionary from the relationships.
+
+    Returns:
+        (string) A formatted postgresql DSN.
+    """
+
+    return "postgresql://{0}:{1}@{2}:{3}/{4}".format(credentials["username"],
+                                                     credentials["password"],
+                                                     credentials["host"],
+                                                     credentials["port"],
+                                                     credentials["path"])
 
 class BuildTimeVariableAccessException(RuntimeError):
     pass

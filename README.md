@@ -120,7 +120,7 @@ def format_my_service(credentials):
     return "some string based on 'credentials'."
 
 # Call this in setup
-config.register_formatter('my_service', 'format_my_service')
+config.register_formatter('my_service', format_my_service)
 
 # Then call this method to get the formatted version
 formatted = config.formatted_credentials('database', 'my_service')
@@ -128,10 +128,11 @@ formatted = config.formatted_credentials('database', 'my_service')
 
 The first parameter is the name of a relationship defined in `.platform.app.yaml`.  The second is a formatter that was previously registered with `register_formatter()`.  If either the service or formatter is missing an exception will be thrown.  The type of `formatted` will depend on the formatter function and can be safely passed directly to the client library.
 
-Two formatters are included out of the box:
+Three formatters are included out of the box:
 
 * `pymongo` returns a DSN appropriate for using `pymongo` to connect to MongoDB. Note that `pymongo` will still need the username and password from the credentials dictionary passed as separate parameters.
-* `pysolr`  returns a DSN appropriate for using `pysolr` to connect to Apache Solr. 
+* `pysolr`  returns a DSN appropriate for using `pysolr` to connect to Apache Solr.
+* `postgresql_dsn` returns a DSN appropriate for postgresql connection.
 
 ### Reading Platform.sh variables
 
