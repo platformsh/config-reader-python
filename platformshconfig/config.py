@@ -209,15 +209,18 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._relationshipsDef:
+            if self.in_build():
+                raise BuildTimeVariableAccessException(
+                    'Relationships are not available during the build phase.'
+                )
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so relationships are not available.'
+                """No relationships are defined. Are you sure you are on Platform.sh?
+                If you're running on your local system you may need to create a tunnel
+                 to access your environment services.  See https://docs.platform.sh/gettingstarted/local/tethered.html"""
             )
-        if self.in_build():
-            raise BuildTimeVariableAccessException(
-                'Relationships are not available during the build phase.'
-            )
-        if relationship not in self._relationshipsDef:
+
+        if not self.has_relationship(relationship):
             raise KeyError(
                 'No relationship defined: {}. Check your .platform.app.yaml file.'
                 .format(relationship))
