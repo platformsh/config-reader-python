@@ -139,25 +139,22 @@ class Config:
         self._environmentVariables = os.environ if environment_variables is None else environment_variables
         self._envPrefix = env_prefix
 
-        if self.is_valid_platform():
-            if self.in_runtime():
-                if self['ROUTES']:
-                    routes = self['ROUTES']
-                    self._routesDef = self.decode(routes)
-                if self['RELATIONSHIPS']:
-                    relationships = self['RELATIONSHIPS']
-                    self._relationshipsDef = self.decode(relationships)
+        if self['ROUTES']:
+            routes = self['ROUTES']
+            self._routesDef = self.decode(routes)
+        if self['RELATIONSHIPS']:
+            relationships = self['RELATIONSHIPS']
+            self._relationshipsDef = self.decode(relationships)
+            self.register_formatter('pymongo', pymongo_formatter)
+            self.register_formatter('pysolr', pysolr_formatter)
+            self.register_formatter('postgresql_dsn', posgresql_dsn_formatter)
 
-                self.register_formatter('pymongo', pymongo_formatter)
-                self.register_formatter('pysolr', pysolr_formatter)
-                self.register_formatter('postgresql_dsn', posgresql_dsn_formatter)
-
-            if self['VARIABLES']:
-                variables = self['VARIABLES']
-                self._variablesDef = self.decode(variables)
-            if self['APPLICATION']:
-                application = self['APPLICATION']
-                self._applicationDef = self.decode(application)
+        if self['VARIABLES']:
+            variables = self['VARIABLES']
+            self._variablesDef = self.decode(variables)
+        if self['APPLICATION']:
+            application = self['APPLICATION']
+            self._applicationDef = self.decode(application)
 
     def is_valid_platform(self):
         """Checks whether the code is running on a platform with valid environment variables.
