@@ -246,7 +246,7 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._variablesDef:
             return default
         return self._variablesDef.get(name, default)
 
@@ -261,9 +261,9 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._variablesDef:
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so the variables dict is not available.'
+                'No variables are defined.  Are you sure you are running on Platform.sh?'
             )
         return self._variablesDef
 
@@ -278,13 +278,13 @@ class Config:
                 If the routes are not accessible due to being in the wrong environment.
 
         """
-        if not self.is_valid_platform():
-            raise NotValidPlatformException(
-                'You are not running on Platform.sh, so routes are not available.'
-            )
         if self.in_build():
             raise BuildTimeVariableAccessException(
                 'Routes are not available during the build phase.'
+            )
+        if not self._routesDef:
+            raise NotValidPlatformException(
+                'No routes are defined.  Are you sure you are running on Platform.sh?'
             )
         return self._routesDef
 
@@ -304,6 +304,11 @@ class Config:
 
         """
 
+        if not self._routesDef:
+            raise NotValidPlatformException(
+                'No routes are defined.  Are you sure you are running on Platform.sh?'
+            )
+
         for (url, route) in self.routes().items():
             if route['id'] == route_id:
                 route['url'] = url
@@ -321,9 +326,9 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._applicationDef():
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so the application definitions are not available.'
+                'No application definition is available.  Are you sure you are running on Platform.sh?'
             )
         return self._applicationDef
 
