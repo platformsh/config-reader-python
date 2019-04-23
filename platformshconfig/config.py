@@ -326,7 +326,7 @@ class Config:
 
         """
 
-        if not self._applicationDef():
+        if not self._applicationDef:
             raise NotValidPlatformException(
                 'No application definition is available.  Are you sure you are running on Platform.sh?'
             )
