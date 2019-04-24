@@ -139,25 +139,22 @@ class Config:
         self._environmentVariables = os.environ if environment_variables is None else environment_variables
         self._envPrefix = env_prefix
 
-        if self.is_valid_platform():
-            if self.in_runtime():
-                if self['ROUTES']:
-                    routes = self['ROUTES']
-                    self._routesDef = self.decode(routes)
-                if self['RELATIONSHIPS']:
-                    relationships = self['RELATIONSHIPS']
-                    self._relationshipsDef = self.decode(relationships)
+        if self['ROUTES']:
+            routes = self['ROUTES']
+            self._routesDef = self.decode(routes)
+        if self['RELATIONSHIPS']:
+            relationships = self['RELATIONSHIPS']
+            self._relationshipsDef = self.decode(relationships)
+            self.register_formatter('pymongo', pymongo_formatter)
+            self.register_formatter('pysolr', pysolr_formatter)
+            self.register_formatter('postgresql_dsn', posgresql_dsn_formatter)
 
-                self.register_formatter('pymongo', pymongo_formatter)
-                self.register_formatter('pysolr', pysolr_formatter)
-                self.register_formatter('postgresql_dsn', posgresql_dsn_formatter)
-
-            if self['VARIABLES']:
-                variables = self['VARIABLES']
-                self._variablesDef = self.decode(variables)
-            if self['APPLICATION']:
-                application = self['APPLICATION']
-                self._applicationDef = self.decode(application)
+        if self['VARIABLES']:
+            variables = self['VARIABLES']
+            self._variablesDef = self.decode(variables)
+        if self['APPLICATION']:
+            application = self['APPLICATION']
+            self._applicationDef = self.decode(application)
 
     def is_valid_platform(self):
         """Checks whether the code is running on a platform with valid environment variables.
@@ -209,15 +206,18 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._relationshipsDef:
+            if self.in_build():
+                raise BuildTimeVariableAccessException(
+                    'Relationships are not available during the build phase.'
+                )
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so relationships are not available.'
+                """No relationships are defined. Are you sure you are on Platform.sh?
+                If you're running on your local system you may need to create a tunnel
+                 to access your environment services.  See https://docs.platform.sh/gettingstarted/local/tethered.html"""
             )
-        if self.in_build():
-            raise BuildTimeVariableAccessException(
-                'Relationships are not available during the build phase.'
-            )
-        if relationship not in self._relationshipsDef:
+
+        if not self.has_relationship(relationship):
             raise KeyError(
                 'No relationship defined: {}. Check your .platform.app.yaml file.'
                 .format(relationship))
@@ -246,7 +246,7 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._variablesDef:
             return default
         return self._variablesDef.get(name, default)
 
@@ -261,9 +261,9 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._variablesDef:
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so the variables dict is not available.'
+                'No variables are defined.  Are you sure you are running on Platform.sh?'
             )
         return self._variablesDef
 
@@ -278,13 +278,13 @@ class Config:
                 If the routes are not accessible due to being in the wrong environment.
 
         """
-        if not self.is_valid_platform():
-            raise NotValidPlatformException(
-                'You are not running on Platform.sh, so routes are not available.'
-            )
         if self.in_build():
             raise BuildTimeVariableAccessException(
                 'Routes are not available during the build phase.'
+            )
+        if not self._routesDef:
+            raise NotValidPlatformException(
+                'No routes are defined.  Are you sure you are running on Platform.sh?'
             )
         return self._routesDef
 
@@ -304,6 +304,11 @@ class Config:
 
         """
 
+        if not self._routesDef:
+            raise NotValidPlatformException(
+                'No routes are defined.  Are you sure you are running on Platform.sh?'
+            )
+
         for (url, route) in self.routes().items():
             if route['id'] == route_id:
                 route['url'] = url
@@ -321,9 +326,9 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
+        if not self._applicationDef:
             raise NotValidPlatformException(
-                'You are not running on Platform.sh, so the application definitions are not available.'
+                'No application definition is available.  Are you sure you are running on Platform.sh?'
             )
         return self._applicationDef
 

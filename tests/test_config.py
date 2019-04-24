@@ -202,6 +202,20 @@ class ConfigTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             config.credentials('database', 3)
 
+    def test_credentials_work_in_local(self):
+        env = self.mockEnvironmentDeploy
+        env.pop('PLATFORM_APPLICATION', None)
+        env.pop('PLATFORM_ENVIRONMENT', None)
+        env.pop('PLATFORM_BRANCH', None)
+
+        config = Config(env)
+
+        creds = config.credentials('database')
+
+        self.assertEqual('mysql', creds['scheme'])
+        self.assertEqual('mysql:10.2', creds['type'])
+
+
     def test_has_relationship_returns_true_for_existing_relationship(self):
 
         env = self.mockEnvironmentDeploy
