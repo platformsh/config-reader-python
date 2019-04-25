@@ -492,10 +492,6 @@ class Config:
 
         """
 
-        if not self.is_valid_platform():
-            raise NotValidPlatformException(
-                'You are not running on Platform.sh, so the {0} variable is not available.'.format(config_property)
-            )
         is_build_var = config_property in self._directVariables.keys()
         is_runtime_var = config_property in self._directVariablesRuntime.keys()
 
@@ -503,47 +499,25 @@ class Config:
         # with it.
         is_unprefixed_var = config_property in self._unPrefixedVariablesRuntime.keys()
 
-        if self.in_build() and is_runtime_var:
-            raise BuildTimeVariableAccessException(
-                'The {0} variable is not available during build time.'.format(config_property)
-            )
         if is_build_var:
-            return self[self._directVariables[config_property]]
-        if is_runtime_var:
-            return self[self._directVariablesRuntime[config_property]]
-        if is_unprefixed_var:
-            return self._environmentVariables.get(self._unPrefixedVariablesRuntime[config_property])
-        raise AttributeError('No such variable defined: '.format(config_property))
+            value = self[self._directVariables[config_property]]
+        elif is_runtime_var:
+            value = self[self._directVariablesRuntime[config_property]]
+        elif is_unprefixed_var:
+            value = self._environmentVariables.get(self._unPrefixedVariablesRuntime[config_property])
+        else:
+            raise AttributeError('No such variable defined: {}'.format(config_property))
 
-    def isset(self, config_property):
-        """Checks whether a configuration property is set.
+        if not value:
+            if self.in_build() and (is_runtime_var or is_unprefixed_var):
+                raise BuildTimeVariableAccessException(
+                    'The {} variable is not available during build time.'.format(config_property)
+                )
+            raise NotValidPlatformException(
+                'The {} variable is not defined. Are you sure you\'re running on Platform.sh?'.format(config_property)
+            )
 
-        Args:
-            config_property:
-                A (magic) property name.
-
-        Returns:
-            bool:
-                True if the property exists and is not None, False otherwise.
-
-        """
-
-        if not self.is_valid_platform():
-            return False
-
-        is_build_var = config_property in self._directVariables.keys()
-        is_runtime_var = config_property in self._directVariablesRuntime.keys()
-
-        # For now, all unprefixed variables are also runtime variables. If that ever changes this logic will change
-        # with it.
-        is_unprefixed_var = config_property in self._unPrefixedVariablesRuntime.keys()
-
-        if self.in_build():
-            return is_build_var and config_property is not None
-        if is_build_var or is_runtime_var or is_unprefixed_var:
-            return config_property is not None
-        return False
-
+        return value
 
 def pymongo_formatter(credentials):
     """Returns a DSN for a pymongo-MongoDB connection.

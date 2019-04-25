@@ -308,6 +308,36 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue(hasattr(config, 'port'))
         self.assertTrue(hasattr(config, 'socket'))
 
+    def test_build_and_deploy_properties_mocked_in_local_exist(self):
+        env = self.mockEnvironmentDeploy
+        env.pop('PLATFORM_APPLICATION', None)
+        env.pop('PLATFORM_ENVIRONMENT', None)
+        env.pop('PLATFORM_BRANCH', None)
+
+        config = Config(env)
+
+        self.assertEqual('/app', config.appDir)
+        self.assertEqual('app', config.applicationName)
+        self.assertEqual('test-project', config.project)
+        self.assertEqual('abc123', config.treeID)
+        self.assertEqual('def789', config.projectEntropy)
+
+        self.assertEqual('/app/web', config.documentRoot)
+        self.assertEqual('1.2.3.4', config.smtpHost)
+        self.assertEqual('8080', config.port)
+        self.assertEqual('unix://tmp/blah.sock', config.socket)
+
+        self.assertTrue(hasattr(config, 'appDir'))
+        self.assertTrue(hasattr(config, 'applicationName'))
+        self.assertTrue(hasattr(config, 'project'))
+        self.assertTrue(hasattr(config, 'treeID'))
+        self.assertTrue(hasattr(config, 'projectEntropy'))
+
+        self.assertTrue(hasattr(config, 'documentRoot'))
+        self.assertTrue(hasattr(config, 'smtpHost'))
+        self.assertTrue(hasattr(config, 'port'))
+        self.assertTrue(hasattr(config, 'socket'))
+
     def test_deploy_property_in_build_throws(self):
 
         env = self.mockEnvironmentBuild
