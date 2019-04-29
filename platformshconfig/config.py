@@ -255,16 +255,12 @@ class Config:
 
         If you're looking for a specific variable, the variable() method is a more robust option.
         This method is for classes where you want to scan the whole variables list looking for a pattern.
+        It's valid for there to be no variables defined at all, so there's no guard for missing values.
 
         Returns:
             The full variables dict.
 
         """
-
-        if not self._variablesDef:
-            raise NotValidPlatformException(
-                'No variables are defined.  Are you sure you are running on Platform.sh?'
-            )
         return self._variablesDef
 
     def routes(self):
