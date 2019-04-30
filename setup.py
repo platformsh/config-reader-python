@@ -12,7 +12,7 @@ from setuptools.command.install import install
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "2.2.1"
+VERSION = "2.2.3"
 
 with open('README.md', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
