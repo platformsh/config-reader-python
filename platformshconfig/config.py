@@ -314,19 +314,15 @@ class Config:
                 The name of the upstream app on which to filter, if any.
 
         Returns:
-            An iterable of route definitions.
+            An dictionary of route definitions.
 
         """
-        output = {}
-        for (url, route) in self.routes().items():
-            if route["type"] == "upstream":
-                if app_name:
-                    if app_name == route["upstream"].split(":")[0]:
-                        output[url] = route
-                else:
-                    output[url] = route
-        return output
-
+        # On Dedicated, the upstream name sometimes is `app:http` instead of just `app`.
+        # If no name is specified then don't bother checking.
+        if app_name:
+            return {url: route for url, route in self.routes().items() if route["type"] == "upstream" and app_name == route["upstream"].split(":")[0]}
+        else:
+            return {url: route for url, route in self.routes().items() if route["type"] == "upstream"}
 
     def get_route(self, route_id):
         """Get route definition by route ID.
