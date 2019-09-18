@@ -19,7 +19,7 @@ jobs:
   build:
     working_directory: ~/config-reader-python3
     docker:
-      - image: circleci/python:3.6.4
+      - image: circleci/python:3.7.2
         environment:
           PIPENV_VENV_IN_PROJECT: true
 
@@ -45,7 +45,7 @@ jobs:
   deploy:
     working_directory: ~/config-reader-python3
     docker:
-      - image: circleci/python:3.6.4
+      - image: circleci/python:3.7.2
         environment:
           PIPENV_VENV_IN_PROJECT: true
 

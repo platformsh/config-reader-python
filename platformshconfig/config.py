@@ -284,6 +284,50 @@ class Config:
             )
         return self._routesDef
 
+    def get_primary_route(self):
+        """Returns the primary route.
+
+        The primary route is the one marked primary in `routes.yaml`, or else
+        the first non-direct route in that file if none are marked.
+
+        Returns:
+            The route definition. The generated URL of the route is added as a "url" key.
+
+        """
+        for (url, route) in self.routes().items():
+            if route["primary"]:
+                return route
+        raise KeyError("No primary route found. This isn't supposed to happen.")
+
+    def get_upstream_routes(self, app_name=None):
+        """Returns just those routes that point to a valid upstream.
+
+        The method is similar to routes(), but filters out redirect routes that are rarely
+        useful for app configuration. I desired it can also filter to just those routes
+        whose upstream is a given application name. To retrieve routes that point to the
+        current application where the code is being run, use:
+
+        routes = config.get_upstream_routes(config._applicationName)
+
+        Args:
+            app_name (string|None):
+                The name of the upstream app on which to filter, if any.
+
+        Returns:
+            An iterable of route definitions.
+
+        """
+        output = {}
+        for (url, route) in self.routes().items():
+            if route["type"] == "upstream":
+                if app_name:
+                    if app_name == route["upstream"].split(":")[0]:
+                        output[url] = route
+                else:
+                    output[url] = route
+        return output
+
+
     def get_route(self, route_id):
         """Get route definition by route ID.
 
