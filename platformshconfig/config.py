@@ -303,7 +303,7 @@ class Config:
         """Returns just those routes that point to a valid upstream.
 
         The method is similar to routes(), but filters out redirect routes that are rarely
-        useful for app configuration. I desired it can also filter to just those routes
+        useful for app configuration. If desired it can also filter to just those routes
         whose upstream is a given application name. To retrieve routes that point to the
         current application where the code is being run, use:
 
@@ -314,7 +314,7 @@ class Config:
                 The name of the upstream app on which to filter, if any.
 
         Returns:
-            An dictionary of route definitions.
+            A dictionary of route definitions.
 
         """
         if app_name:
