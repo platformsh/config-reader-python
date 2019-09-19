@@ -32,7 +32,6 @@ jobs:
             - v{{ .Environment.CACHE_VERSION }}-dep-cache-
       - run:
           command: |
-            pipenv --rm
             pip install --user pipenv
             pipenv install
       - save_cache:
@@ -59,7 +58,6 @@ jobs:
             - v{{ .Environment.CACHE_VERSION }}-dep-cache-
       - run:
           command: |
-            pipenv --rm
             pip install --user pipenv
             pipenv install
       - save_cache:
