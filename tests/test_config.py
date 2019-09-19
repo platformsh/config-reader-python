@@ -117,6 +117,44 @@ class ConfigTest(unittest.TestCase):
         with self.assertRaises(KeyError):
             config.get_route('missing')
 
+    def test_primary_route_returns_correct_route(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+        route = config.get_primary_route()
+
+        self.assertEqual("https://www.{default}/", route["original_url"])
+
+    def test_upstream_routes(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+        routes = config.get_upstream_routes()
+
+        self.assertEqual(len(routes), 3)
+        self.assertTrue("https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/" in routes)
+        self.assertEqual("https://www.{default}/", routes["https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/"]["original_url"])
+
+    def test_upstream_routes_for_app(self):
+
+        config = Config(self.mockEnvironmentDeploy)
+        routes = config.get_upstream_routes("app")
+
+        self.assertEqual(len(routes), 2)
+        self.assertTrue("https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/" in routes)
+        self.assertEqual("https://www.{default}/", routes["https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/"]["original_url"])
+
+    def test_upstream_routes_for_app_on_dedicated(self):
+        env = self.mockEnvironmentDeploy
+        routeData = self.loadJsonFile('PLATFORM_ROUTES')
+        routeData['https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/']['upstream'] = 'app:http'
+        env['PLATFORM_ROUTES'] = self.encode(routeData)
+
+        config = Config(env)
+        routes = config.get_upstream_routes("app")
+
+        self.assertEqual(len(routes), 2)
+        self.assertTrue("https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/" in routes)
+        self.assertEqual("https://www.{default}/", routes["https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/"]["original_url"])
+
     def test_onenterprise_returns_true_on_enterprise(self):
 
         env = self.mockEnvironmentDeploy
