@@ -317,9 +317,9 @@ class Config:
             An dictionary of route definitions.
 
         """
-        # On Dedicated, the upstream name sometimes is `app:http` instead of just `app`.
-        # If no name is specified then don't bother checking.
         if app_name:
+            # On Dedicated, the upstream name sometimes is `app:http` instead of just `app`.
+            # If no name is specified then don't bother checking.
             return {url: route for url, route in self.routes().items() if route["type"] == "upstream" and app_name == route["upstream"].split(":")[0]}
         else:
             return {url: route for url, route in self.routes().items() if route["type"] == "upstream"}
