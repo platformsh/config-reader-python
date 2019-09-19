@@ -17,7 +17,7 @@ workflows:
               ignore: /.*/
 jobs:
   build:
-    working_directory: ~/config-reader-python3
+    working_directory: ~/config-reader-python
     docker:
       - image: circleci/python:3.6.4
         environment:
