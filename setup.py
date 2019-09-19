@@ -12,7 +12,7 @@ from setuptools.command.install import install
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "2.2.4"
+VERSION = "2.2.5"
 
 with open('README.md', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
@@ -42,6 +42,7 @@ setup(
     author_email='sayhello@platform.sh',
     license='MIT',
     long_description=__readme__ + '\n\n' + __changelog__,
+    long_description_content_type="text/markdown",
     packages=find_packages(),
     tests_require=['pytest'],
     classifiers=[
