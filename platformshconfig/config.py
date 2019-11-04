@@ -377,7 +377,7 @@ class Config:
         return self._applicationDef
 
     def on_dedicated(self):
-        """Determines if the current environment is at Platform.sh Enterprise environment.
+        """Determines if the current environment is a Platform.sh Dedicated environment.
 
         Returns:
             bool:
