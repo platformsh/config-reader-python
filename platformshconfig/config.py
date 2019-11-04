@@ -394,7 +394,6 @@ class Config:
         Returns:
             bool:
                 True on an Enterprise environment, False otherwise.
-
         """
 
         return self.on_dedicated()
