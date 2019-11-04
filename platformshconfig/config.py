@@ -376,8 +376,8 @@ class Config:
             )
         return self._applicationDef
 
-    def on_enterprise(self):
-        """Determines if the current environment is a Platform.sh Enterprise environment.
+    def on_dedicated(self):
+        """Determines if the current environment is a Platform.sh Dedicated environment.
 
          @deprecated
 
@@ -406,6 +406,17 @@ class Config:
         """
 
         return self.is_valid_platform() and self['MODE'] == 'enterprise'
+
+    def on_enterprise(self):
+        """Determines if the current environment is a Platform.sh Enterprise environment.
+           Depreated, use on_dedicated instead
+
+        Returns:
+            bool:
+                True on a Dedicated environment, False otherwise.
+        """
+
+        return self.on_dedicated()
 
     def on_production(self):
         """Determines if the current environment is a production environment.
