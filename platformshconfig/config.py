@@ -379,9 +379,29 @@ class Config:
     def on_enterprise(self):
         """Determines if the current environment is a Platform.sh Enterprise environment.
 
+         @deprecated
+
+        The Platform.sh "Enterprise" will soon be referred to exclusively as
+        "Dedicated". the `on_enterprise` method remains available for now, but it
+        will be removed in a future version of this library.
+
+        It is recommended that you update your projects to use `on_dedicated` as
+        soon as possible.
+
         Returns:
             bool:
-                True on an Enterprise environment, False otherwise.
+                True on an Dedicated environment, False otherwise.
+
+        """
+
+        return self.on_dedicated()
+
+    def on_dedicated(self):
+        """Determines if the current environment is a Platform.sh Dedicated environment.
+
+        Returns:
+            bool:
+                True on an Dedicated environment, False otherwise.
 
         """
 
@@ -403,7 +423,7 @@ class Config:
 
         if not self.is_valid_platform() and not self.in_build():
             return False
-        prod_branch = 'production' if self.on_enterprise() else 'master'
+        prod_branch = 'production' if self.on_dedicated() else 'master'
         return self['BRANCH'] == prod_branch
 
     def register_formatter(self, name, formatter):
