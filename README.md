@@ -62,6 +62,8 @@ config.in_runtime()
 
 config.on_enterprise()
 
+config.on_dedicated()
+
 config.on_production()
 ```
 
