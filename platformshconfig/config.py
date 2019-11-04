@@ -416,7 +416,7 @@ class Config:
 
         if not self.is_valid_platform() and not self.in_build():
             return False
-        prod_branch = 'production' if self.on_enterprise() else 'master'
+        prod_branch = 'production' if self.on_dedicated() else 'master'
         return self['BRANCH'] == prod_branch
 
     def register_formatter(self, name, formatter):
