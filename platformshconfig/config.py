@@ -388,7 +388,7 @@ class Config:
         return self.is_valid_platform() and self['MODE'] == 'enterprise'
 
     def on_enterprise(self):
-        """Determines if the current environment is at Platform.sh Enterprise environment.
+        """Determines if the current environment is a Platform.sh Enterprise environment.
            Depreated, use on_dedicated instead
 
         Returns:
