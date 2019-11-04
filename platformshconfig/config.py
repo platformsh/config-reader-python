@@ -397,7 +397,7 @@ class Config:
 
         """
 
-        return self.on_dedicated
+        return self.on_dedicated()
 
     def on_production(self):
         """Determines if the current environment is a production environment.
