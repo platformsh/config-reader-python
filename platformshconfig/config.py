@@ -393,7 +393,7 @@ class Config:
 
         Returns:
             bool:
-                True on an Enterprise environment, False otherwise.
+                True on a Dedicated environment, False otherwise.
         """
 
         return self.on_dedicated()
