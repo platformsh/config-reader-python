@@ -163,6 +163,7 @@ class ConfigTest(unittest.TestCase):
         config = Config(env)
 
         self.assertTrue(config.on_enterprise())
+        self.assertTrue(config.on_dedicated())
 
     def test_onenterprise_returns_false_on_standard(self):
 
@@ -171,6 +172,7 @@ class ConfigTest(unittest.TestCase):
         config = Config(env)
 
         self.assertFalse(config.on_enterprise())
+        self.assertFalse(config.on_dedicated())
 
     def test_onproduction_on_enterprise_prod_is_true(self):
 
