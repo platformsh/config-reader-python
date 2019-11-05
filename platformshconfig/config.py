@@ -362,6 +362,9 @@ class Config:
     def application(self):
         """Returns the application definition dict.
 
+        This is, approximately, the .platform.app.yaml file as a nested dict. However, it also has other information
+        added by Platform.sh as part of the build and deploy process.
+
         Returns:
             The application definition dict.
 
@@ -385,7 +388,7 @@ class Config:
         return self.is_valid_platform() and self['MODE'] == 'enterprise'
 
     def on_enterprise(self):
-        """Determines if the current environment is a Platform.sh Enterprise environment.
+        """Determines if the current environment is a Platform.sh Dedicated environment.
 
         @deprecated
 
