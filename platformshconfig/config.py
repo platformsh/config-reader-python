@@ -362,11 +362,6 @@ class Config:
     def application(self):
         """Returns the application definition dict.
 
-           @deprecated
-
-           The Platform.sh "Enterprise" will soon be referred to exclusively as "Dedicated". the `on_enterprise` method remains available for now, but it will be removed in a future version of this library.
-           It is recommended that you update your projects to use `on_dedicated` as soon as possible.
-
         Returns:
             The application definition dict.
 
@@ -383,7 +378,7 @@ class Config:
 
         Returns:
             bool:
-                True on an Enterprise environment, False otherwise.
+                True on an Dedicated environment, False otherwise.
 
         """
 
@@ -391,7 +386,11 @@ class Config:
 
     def on_enterprise(self):
         """Determines if the current environment is a Platform.sh Enterprise environment.
-           Depreated, use on_dedicated instead
+
+        @deprecated
+
+        The Platform.sh "Enterprise" will soon be referred to exclusively as "Dedicated". the `on_enterprise` method remains available for now, but it will be removed in a future version of this library.
+        It is recommended that you update your projects to use `on_dedicated` as soon as possible.
 
         Returns:
             bool:
