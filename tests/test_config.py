@@ -155,7 +155,7 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue("https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/" in routes)
         self.assertEqual("https://www.{default}/", routes["https://www.master-7rqtwti-gcpjkefjk4wc2.us-2.platformsh.site/"]["original_url"])
 
-    def test_onenterprise_returns_true_on_enterprise(self):
+    def test_ondedicated_returns_true_on_dedicated(self):
 
         env = self.mockEnvironmentDeploy
         env['PLATFORM_MODE'] = 'enterprise'
@@ -163,16 +163,18 @@ class ConfigTest(unittest.TestCase):
         config = Config(env)
 
         self.assertTrue(config.on_enterprise())
+        self.assertTrue(config.on_dedicated())
 
-    def test_onenterprise_returns_false_on_standard(self):
+    def test_ondedicated_returns_false_on_standard(self):
 
         env = self.mockEnvironmentDeploy
 
         config = Config(env)
 
         self.assertFalse(config.on_enterprise())
+        self.assertFalse(config.on_dedicated())
 
-    def test_onproduction_on_enterprise_prod_is_true(self):
+    def test_onproduction_on_dedicated_prod_is_true(self):
 
         env = self.mockEnvironmentDeploy
         env['PLATFORM_MODE'] = 'enterprise'
@@ -182,7 +184,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertTrue(config.on_production())
 
-    def test_onproduction_on_enterprise_stg_is_false(self):
+    def test_onproduction_on_dedicated_stg_is_false(self):
 
         env = self.mockEnvironmentDeploy
         env['PLATFORM_MODE'] = 'enterprise'

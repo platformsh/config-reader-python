@@ -60,10 +60,16 @@ config.in_build()
 
 config.in_runtime()
 
-config.on_enterprise()
+config.on_dedicated()
 
 config.on_production()
 ```
+
+> **Note:**
+>
+> Platform.sh will no longer refer to its [99.99% uptime SLA product](https://platform.sh/solutions/) as "Enterprise", but rather as "Dedicated". Configuration Reader libraries have in turn been updated to include an `on_dedicated` method to replace `on_enterprise`. For now `on_enterprise` remains available. It now calls the new method and no breaking changes have been introduced.
+>
+> It is recommended that you update your projects to use `on_dedicated` as soon as possible, as `on_enterprise` will be removed in a future version of this library.
 
 ### Read environment variables
 
