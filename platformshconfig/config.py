@@ -92,7 +92,7 @@ class Config:
     """
     A local copy of all environment variables as of when the object was initialized.
     """
-    _environmentVariables = []
+    _environmentVariables = {}
 
     """
     The vendor prefix for all environment variables we care about.
@@ -139,21 +139,21 @@ class Config:
         self._environmentVariables = os.environ if environment_variables is None else environment_variables
         self._envPrefix = env_prefix
 
-        if self['ROUTES']:
-            routes = self['ROUTES']
+        if self._environmentVariables.get(self._envPrefix + 'ROUTES'):
+            routes = self._environmentVariables.get(self._envPrefix + 'ROUTES')  # FIXME: Use PEP 572 on 3.8+
             self._routesDef = self.decode(routes)
-        if self['RELATIONSHIPS']:
-            relationships = self['RELATIONSHIPS']
+        if self._environmentVariables.get(self._envPrefix + 'RELATIONSHIPS'):
+            relationships = self._environmentVariables.get(self._envPrefix + 'RELATIONSHIPS')
             self._relationshipsDef = self.decode(relationships)
             self.register_formatter('pymongo', pymongo_formatter)
             self.register_formatter('pysolr', pysolr_formatter)
             self.register_formatter('postgresql_dsn', posgresql_dsn_formatter)
 
-        if self['VARIABLES']:
-            variables = self['VARIABLES']
+        if self._environmentVariables.get(self._envPrefix + 'VARIABLES'):
+            variables = self._environmentVariables.get(self._envPrefix + 'VARIABLES')
             self._variablesDef = self.decode(variables)
-        if self['APPLICATION']:
-            application = self['APPLICATION']
+        if self._environmentVariables.get(self._envPrefix + 'APPLICATION'):
+            application = self._environmentVariables.get(self._envPrefix + 'APPLICATION')
             self._applicationDef = self.decode(application)
 
     def is_valid_platform(self):
@@ -164,8 +164,7 @@ class Config:
                 True if configuration can be used, False otherwise.
 
         """
-
-        return 'APPLICATION_NAME' in self
+        return self._envPrefix + 'APPLICATION_NAME' in self._environmentVariables
 
     def in_build(self):
         """Checks whether the code is running in a build environment.
@@ -175,7 +174,7 @@ class Config:
 
         """
 
-        return self.is_valid_platform() and not self['ENVIRONMENT']
+        return self.is_valid_platform() and not self._environmentVariables.get(self._envPrefix + 'ENVIRONMENT')
 
     def in_runtime(self):
         """Checks whether the code is running in a runtime environment.
@@ -184,7 +183,7 @@ class Config:
             bool: True if in a runtime environment, False otherwise.
         """
 
-        return self.is_valid_platform() and self['ENVIRONMENT']
+        return self.is_valid_platform() and self._environmentVariables.get(self._envPrefix + 'ENVIRONMENT')
 
     def credentials(self, relationship, index=0):
         """Retrieves the credentials for accessing a relationship.
@@ -385,7 +384,7 @@ class Config:
 
         """
 
-        return self.is_valid_platform() and self['MODE'] == 'enterprise'
+        return self.is_valid_platform() and self._environmentVariables.get(self._envPrefix + 'MODE') == 'enterprise'
 
     def on_enterprise(self):
         """Determines if the current environment is a Platform.sh Dedicated environment.
@@ -419,7 +418,7 @@ class Config:
         if not self.is_valid_platform() and not self.in_build():
             return False
         prod_branch = 'production' if self.on_dedicated() else 'master'
-        return self['BRANCH'] == prod_branch
+        return self._environmentVariables.get(self._envPrefix + 'BRANCH') == prod_branch
 
     def register_formatter(self, name, formatter):
         """Adds a credential formatter to the configuration.
@@ -479,19 +478,6 @@ class Config:
         """
         return relationship in self._relationshipsDef
 
-    def __getitem__(self, item):
-        """Reads an environment variable, taking the prefix into account.
-
-        Args:
-            item (string):
-                The variable to read.
-
-        """
-
-        check_name = self._envPrefix + item.upper()
-
-        return self._environmentVariables.get(check_name)
-
     @staticmethod
     def decode(variable):
         """Decodes a Platform.sh environment variable.
@@ -516,32 +502,19 @@ class Config:
         except json.decoder.JSONDecodeError:
             print('Error decoding JSON, code %d', json.decoder.JSONDecodeError)
 
-    def __contains__(self, item):
-        """Defines environment variable membership in Config.
-
-        Args:
-            item (string):
-                variable string to be judged.
-
-        Returns:
-            bool:
-                Returns True if Config contains the variable, False otherwise.
-
-        """
-
-        if self[item]:
-            return True
-        return False
-
-    def __getattr__(self, config_property):
+    def __getattr__(self, name):
         """Gets a configuration property.
 
+        Note:
+            Except for the raised exceptions, this method does exactly the
+            same as __getitem__.
+
         Args:
-            config_property (string):
-                A (magic) property name. The properties are documented in the DocBlock for this class.
+            name (string):
+                A (magic) property name. The properties are documented in the docstring for this class.
 
         Returns:
-            The return types are documented in the DocBlock for this class.
+            The return types are documented in the docstring for this class.
 
         Raises:
             RuntimeError:
@@ -550,33 +523,73 @@ class Config:
                 If a variable is not found, or if decoding fails.
 
         """
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError('No such variable defined: {}'.format(name))
 
-        is_build_var = config_property in self._directVariables.keys()
-        is_runtime_var = config_property in self._directVariablesRuntime.keys()
+    def __getitem__(self, item):
+        """Gets a configuration property.
 
-        # For now, all unprefixed variables are also runtime variables. If that ever changes this logic will change
-        # with it.
-        is_unprefixed_var = config_property in self._unPrefixedVariablesRuntime.keys()
+        Args:
+            item (string):
+                A (magic) property name. The properties are documented in the docstring for this class.
 
-        if is_build_var:
-            value = self[self._directVariables[config_property]]
-        elif is_runtime_var:
-            value = self[self._directVariablesRuntime[config_property]]
-        elif is_unprefixed_var:
-            value = self._environmentVariables.get(self._unPrefixedVariablesRuntime[config_property])
+        Returns:
+            The return types are documented in the docstring for this class.
+
+        Raises:
+            RuntimeError:
+                If not running on Platform.sh, and the variable is not found.
+            KeyError:
+                If a variable is not found, or if decoding fails.
+
+        """
+        if item in self._directVariables.keys():
+            value = self._environmentVariables.get(self._envPrefix + self._directVariables[item].upper())
+        elif item in self._directVariablesRuntime.keys():
+            value = self._environmentVariables.get(self._envPrefix + self._directVariablesRuntime[item].upper())
+        elif item in self._unPrefixedVariablesRuntime.keys():
+            value = self._environmentVariables.get(self._unPrefixedVariablesRuntime[item])
         else:
-            raise AttributeError('No such variable defined: {}'.format(config_property))
+            raise KeyError('No such variable defined: {}'.format(item))
 
         if not value:
-            if self.in_build() and (is_runtime_var or is_unprefixed_var):
+            if item not in self:
                 raise BuildTimeVariableAccessException(
-                    'The {} variable is not available during build time.'.format(config_property)
+                    'The {} variable is not available during build time.'.format(item)
                 )
             raise NotValidPlatformException(
-                'The {} variable is not defined. Are you sure you\'re running on Platform.sh?'.format(config_property)
+                'The {} variable is not defined. Are you sure you\'re running on Platform.sh?'.format(item)
             )
 
         return value
+
+    def __iter__(self):
+        """Returns an iterator over the available configuration keys.
+
+        Returns:
+            iter: An iterator over the available configuration keys.
+
+        """
+        yield from self._directVariables.keys()
+        # Make available the runtime variables only if we aren't in a build
+        # environment; other variables aren't available on build time.
+        if not self.in_build():
+            yield from self._directVariablesRuntime.keys()
+            # For now, all unprefixed variables are also runtime variables.
+            # If that ever changes this logic will change with it.
+            yield from self._unPrefixedVariablesRuntime.keys()
+
+    def __len__(self):
+        """Returns the number of available configuration properties.
+
+        Returns:
+            int: The number of available configuration properties.
+
+        """
+        return len(self.keys())
+
 
 def pymongo_formatter(credentials):
     """Returns a DSN for a pymongo-MongoDB connection.
