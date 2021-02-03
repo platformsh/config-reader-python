@@ -13,9 +13,10 @@ jobs:
                 python: [ '3.5', '3.6', '3.7', '3.8' ]
         steps:
             - uses: actions/checkout@v2
+            - uses: VaultVulp/action-pipenv@v2.0.1
             - uses: actions/setup-python@v1
               with:
                   python-version: ${{ matrix.python }}
-            - run: pip install --user pipenv
+            # - run: pip install --user pipenv
             - run: pipenv install
             - run: pipenv run "pytest"
