@@ -58,7 +58,7 @@ class Config:
 
     """
     Local index of the variables that can be accessed as direct properties (build and
-    runtime). The key is the property that will be read. The value is the environment variables, minus prefix,
+    runtime). The key is the property that will be read. The value is the environment variables, minus the variable prefix,
     that contains the value to look up.
     """
     _directVariables = {
@@ -97,7 +97,7 @@ class Config:
     """
     The vendor prefix for all environment variables we care about.
     """
-    _envPrefix = ''
+    _varPrefix = ''
 
     """
     The routes definition dict. Only available at runtime.
@@ -125,19 +125,19 @@ class Config:
     """
     _credentialFormatters = {}
 
-    def __init__(self, environment_variables=None, env_prefix='PLATFORM_'):
+    def __init__(self, environment_variables=None, var_prefix='PLATFORM_'):
         """Constructs a ConfigReader object.
 
         Args:
             environment_variables (dict):
                 The environment variables to read. Defaults to the current environment. Defaults to None.
-            env_prefix (string):
+            var_prefix (string):
                 The prefix for environment variables. Defaults to 'PLATFORM_'.
 
         """
 
         self._environmentVariables = os.environ if environment_variables is None else environment_variables
-        self._envPrefix = env_prefix
+        self._varPrefix = var_prefix
 
         if self['ROUTES']:
             routes = self['ROUTES']
@@ -232,7 +232,7 @@ class Config:
 
         Note:
             Variables prefixed with `env`: can be accessed as normal environment variables. This method will return
-            such a variable by the name with the prefix still included. Generally it's better to access those variables
+            such a variable by the name with the variable prefix still included. Generally it's better to access those variables
             directly.
 
         Args:
@@ -480,7 +480,7 @@ class Config:
         return relationship in self._relationshipsDef
 
     def __getitem__(self, item):
-        """Reads an environment variable, taking the prefix into account.
+        """Reads an environment variable, taking the variable prefix into account.
 
         Args:
             item (string):
@@ -488,7 +488,7 @@ class Config:
 
         """
 
-        check_name = self._envPrefix + item.upper()
+        check_name = self._varPrefix + item.upper()
 
         return self._environmentVariables.get(check_name)
 
