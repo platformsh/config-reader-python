@@ -644,4 +644,3 @@ class NoCredentialFormatterFoundException(ValueError):
 
 class NotValidPlatformException(RuntimeError):
     pass
-    
