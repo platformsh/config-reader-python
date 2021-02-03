@@ -5,12 +5,12 @@ on:
     pull_request: ~
 
 jobs:
-    pytest:
-        name: pytest tests on ${{ matrix.python }}
+    build:
+        name: Build and test on ${{ matrix.python }}
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python: [ '3.5', '3.6', '3.7', '3.8' ]
+                python: [ '2.7', '3.5', '3.6', '3.7', '3.8' ]
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-python@v1
@@ -19,3 +19,10 @@ jobs:
             - run: python -m pip install --upgrade pipenv wheel
             - run: pipenv install
             - run: pipenv run "pytest"
+    # deploy:
+    #     name: Publish on pypi
+    #     runs-on: ubuntu-latest
+    #     uses: pypa/gh-action-pypi-publish@master
+    #     with:
+    #         user: __token__
+    #         password: ${{ secrets.PYPI_API_TOKEN }}

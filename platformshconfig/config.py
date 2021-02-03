@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 
-class Config:
+class Config(object):
     """Reads Platform.sh configuration from environment variables.
 
     See: https://docs.platform.sh/development/variables.html
