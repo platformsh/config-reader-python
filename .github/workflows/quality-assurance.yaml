@@ -28,3 +28,4 @@ jobs:
           with:
                 user: __token__
                 password: ${{ secrets.PYPI_API_TOKEN }}
+          run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GHACTION_TAG
