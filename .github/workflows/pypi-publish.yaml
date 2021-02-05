@@ -9,13 +9,20 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
+        - name: Setup Python 3.7
+          uses: actions/setup-python@v1
+          with:
+              python-version: 3.7
+        - name: Prep package
+          run: python -m pip install --upgrade pipenv wheel
+        - run: pipenv install
+        - run: pipenv run "pytest"
         - name: Get tag
           id: vars
           run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-        - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        - name: Verify tag match
           env:
-            GHACTION_TAG: ${{ steps.vars.outputs.tag }}
-          uses: pypa/gh-action-pypi-publish@v1.4.1
-          with:
-                user: __token__
-                password: ${{ secrets.PYPI_API_TOKEN }}
+              GHACTION_TAG: ${{ steps.vars.outputs.tag }}
+          run: pipenv run python setup.py verify
+        - name: Create packages
+          run: pipenv run python setup.py sdist bdist_wheel
