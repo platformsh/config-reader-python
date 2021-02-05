@@ -12,7 +12,7 @@ from setuptools.command.install import install
 
 cwd = os.path.abspath(os.path.dirname(__file__))
 
-VERSION = "2.3.1"
+VERSION = "2.4.0"
 
 with open('README.md', 'r', encoding='utf-8') as f:
     __readme__ = f.read()
@@ -25,7 +25,7 @@ class VerifyVersionCommand(install):
     description = 'verify that the git tag matches our version'
 
     def run(self):
-        tag = os.getenv('CIRCLE_TAG')
+        tag = os.getenv('GHACTION_TAG')
 
         if tag != VERSION:
             info = "Git tag: {0} does not match the version of this app: {1}".format(

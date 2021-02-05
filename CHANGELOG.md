@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.4.0] - 2021-02-03
+
+### Added
+
+* GitHub actions for tests (`quality-assurance.yaml`) and publishing to pypi (`pypi-publish.yaml`).
+
+### Changed 
+
+* named variable`prefix` on constructor renamed to `var_prefix`.
+
+### Removed
+
+* CircleCI action config. 
+
 ## [2.3.1] - 2019-11-04
 
 ### Added
