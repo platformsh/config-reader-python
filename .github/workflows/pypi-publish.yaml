@@ -20,9 +20,15 @@ jobs:
         - name: Get tag
           id: vars
           run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        - name: Create packages
+          run: pipenv run python setup.py sdist bdist_wheel
+        - name: Publish to pypi
+        - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         - name: Verify tag match
           env:
               GHACTION_TAG: ${{ steps.vars.outputs.tag }}
           run: pipenv run python setup.py verify
-        - name: Create packages
-          run: pipenv run python setup.py sdist bdist_wheel
+        - uses: pypa/gh-action-pypi-publish@v1.4.1
+          with:
+              user: __token__
+              password: ${{ secrets.PYPI_API_TOKEN }}
