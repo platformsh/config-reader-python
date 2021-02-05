@@ -18,17 +18,13 @@ jobs:
         - run: pipenv install
         - run: pipenv run "pytest"
         - name: Get tag
-          id: vars
+          id: getTag
           run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
         - name: Create packages
           run: pipenv run python setup.py sdist bdist_wheel
-        - name: Publish to pypi
-        - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         - name: Verify tag match
           env:
-              GHACTION_TAG: ${{ steps.vars.outputs.tag }}
+              GHACTION_TAG: ${{ steps.getTag.outputs.tag }}
+          if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
           run: pipenv run python setup.py verify
-        - uses: pypa/gh-action-pypi-publish@v1.4.1
-          with:
-              user: __token__
-              password: ${{ secrets.PYPI_API_TOKEN }}
+
