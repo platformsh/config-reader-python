@@ -171,4 +171,4 @@ The `get_route()` method takes a single string for the route ID ("main" in this 
 
 To access all routes, or to search for a route that has no ID, the `routes()` method returns an dictionary of routes keyed by their URL.  That mirrors the structure of the `PLATFORM_ROUTES` environment variable.
 
-If called in the build phase an exception is thrown.
+If called in the build phase, in a non-Platform.sh environment or in a worker environment, a `RuntimeError` is raised.
