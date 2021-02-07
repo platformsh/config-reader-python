@@ -280,7 +280,7 @@ class Config:
             )
         if not self._routesDef:
             raise NotValidPlatformException(
-                'No routes are defined.  Are you sure you are running on Platform.sh?'
+                'No routes are defined. Are you sure you are running on Platform.sh and not on a worker instance?'
             )
         return self._routesDef
 
