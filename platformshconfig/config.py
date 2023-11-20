@@ -418,8 +418,8 @@ class Config:
 
         if not self.is_valid_platform() and not self.in_build():
             return False
-        prod_branch = 'production' if self.on_dedicated() else 'master'
-        return self['BRANCH'] == prod_branch
+        platform_environment_type = os.environ['PLATFORM_ENVIRONMENT_TYPE']
+        return platform_environment_type == 'production'
 
     def register_formatter(self, name, formatter):
         """Adds a credential formatter to the configuration.
